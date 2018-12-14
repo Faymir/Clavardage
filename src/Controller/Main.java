@@ -13,9 +13,11 @@ import java.util.Calendar;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/template.fxml"));
+//        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/template.fxml"));
+        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/connexion.fxml"));
 
         MainController mainController = new MainController();
+        ConnexionController connexionController = new ConnexionController();
         UsersList usersList = new UsersList();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
         String timeStamp = dateFormat.format(Calendar.getInstance().getTime());
@@ -25,7 +27,9 @@ public class Main extends Application {
         Callback<Class<?>, Object> controllerFactory = type -> {
             if (type == MainController.class) {
                 return mainController ;
-            } else {
+            } else if(type == ConnexionController.class) {
+                return connexionController;
+            }else {
                 // default behavior for controllerFactory:
                 try {
                     return type.newInstance();
