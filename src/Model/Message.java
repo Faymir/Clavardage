@@ -29,11 +29,13 @@ public class Message {
     public String getSender() {
         return from;
     }
-
+    
     public void setSender(String from) {
         this.from = from;
     }
-
+    public String getReceiver() {
+        return this.to;
+    }
     public Date getDate() {
         return date;
     }

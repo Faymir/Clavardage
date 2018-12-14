@@ -5,6 +5,7 @@ package Controller;
 
 import Model.Message;
 import Model.WebViewData;
+import Network.ConnexionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -77,12 +78,7 @@ public class MainController {
 
     @FXML
     void initialize(){
-        Message m1 = new Message("Haha", Calendar.getInstance().getTime(), "Salut! comment vas tu?", null);
-        Message m2 = new Message(null, Calendar.getInstance().getTime(), "Je vais bien et toi?", "Haha");
-        Vector<Message> v = new Vector<>();
-        v.add(m1);
-        v.add(m2);
-        discussion.setDiscussion(v);
+
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
     }
