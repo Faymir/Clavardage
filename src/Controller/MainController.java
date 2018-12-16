@@ -82,8 +82,7 @@ public class MainController {
         Vector<Message> v = new Vector<>();
         v.add(m1);
         v.add(m2);
-        discussion.setDiscussion(v);
-        
+        discussion.setDiscussion(v); 
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
     }
