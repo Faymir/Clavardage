@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import Model.Message;
+import Model.Signal;
+import Model.Type;
 
 
 /**
@@ -25,7 +27,7 @@ import Model.Message;
  *
  */
 
-public class ConnexionManager implements Runnable{
+public class ConnexionManager extends Observable implements Runnable{
 	private ServerSocket serverSocket = null;
 	private String clientName = null;
 	private Vector<UserChatListener> friendList;
@@ -148,6 +150,8 @@ public class ConnexionManager implements Runnable{
 				sendMessage(s,clientName + "%&%" + "initConnection");
                 (new Thread(u)).start();
 				this.friendList.add(u);
+                setChanged();
+                notifyObservers(new Signal(Type.INIT_CHAT, uname));
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -170,11 +174,15 @@ public class ConnexionManager implements Runnable{
 					UserChatListener u = new UserChatListener(uname, socket);
                     (new Thread(u)).start();
 					this.friendList.add(u);
+					setChanged();
+					notifyObservers(new Signal(Type.INIT_CHAT, uname));
 					printUsers();
 				}
 				break;
 				case "scan":
 					sendMessage(socket,clientName);
+                    setChanged();
+                    notifyObservers(new Signal(Type.SCAN, socket.getInetAddress().getHostAddress()));
 					break;
 				case "disconnect":
 					this.connectedUsers.remove(uname);
@@ -191,6 +199,9 @@ public class ConnexionManager implements Runnable{
                         u = null;
                     }
 					System.out.println("User [" + uname + "] disconnected!!");
+
+                    setChanged();
+                    notifyObservers(new Signal(Type.DISCONNECT, uname));
 					printUsers();
 					break;
 				case "connected":
@@ -202,6 +213,9 @@ public class ConnexionManager implements Runnable{
 						e.printStackTrace();
 					}
 					scanUsers();
+
+                    setChanged();
+                    notifyObservers(new Signal(Type.CONNECT, uname));
 					printUsers();
 					break;
 				default:

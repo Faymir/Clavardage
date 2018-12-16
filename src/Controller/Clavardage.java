@@ -10,9 +10,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class Clavardage extends Application {
     private ConnexionManager connexionManager;
@@ -23,12 +20,13 @@ public class Clavardage extends Application {
         connexionManager = new ConnexionManager();
         primaryStage = stage;
         //UI INIT
-        String current = System.getProperty("user.dir") + "/src/View/";
-        FXMLLoader root = new FXMLLoader(getClass().getResource(current + "template.fxml"));
+        String current = System.getProperty("user.dir") + "/src/Controller/View/";
+        System.out.println(current);
+        FXMLLoader root = new FXMLLoader(getClass().getResource("View/template.fxml"));
         MainController mainController = new MainController(connexionManager);
         root.setController(mainController);
 
-        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource(current + "connexionWidget.fxml"));
+        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("View/connexionWidget.fxml"));
         ConnexionController connexionController = new ConnexionController(connexionManager, root);
         UsersList usersList = new UsersList();
 

@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="285.0" prefWidth="492.0" stylesheets="@material.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ConnexionController">
+<VBox prefHeight="285.0" prefWidth="492.0" stylesheets="@material.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
   <children>
       <ProgressBar fx:id="progressBar" maxHeight="1.0" opacity="0.61" prefHeight="0.0" prefWidth="640.0" progress="0.0" scaleY="0.3" />
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">

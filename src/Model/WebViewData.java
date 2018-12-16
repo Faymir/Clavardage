@@ -33,7 +33,7 @@ public class WebViewData {
 
     private void init(){
         try {
-            String current = System.getProperty("user.dir") + "/src/View/";
+            String current = System.getProperty("user.dir") + "/View/";
 //            System.out.println(current);
             head = new String(Files.readAllBytes(Paths.get(current + "head.html")));
             tail = new String(Files.readAllBytes(Paths.get(current +"tail.txt")));
