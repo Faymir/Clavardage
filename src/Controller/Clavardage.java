@@ -4,10 +4,12 @@ import Network.ConnexionManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -21,17 +23,14 @@ public class Clavardage extends Application {
         connexionManager = new ConnexionManager();
         primaryStage = stage;
         //UI INIT
-
-        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/template.fxml"));
+        String current = System.getProperty("user.dir") + "/src/View/";
+        FXMLLoader root = new FXMLLoader(getClass().getResource(current + "template.fxml"));
         MainController mainController = new MainController(connexionManager);
         root.setController(mainController);
 
-        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("../View/connexionWidget.fxml"));
+        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource(current + "connexionWidget.fxml"));
         ConnexionController connexionController = new ConnexionController(connexionManager, root);
         UsersList usersList = new UsersList();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm");
-        String timeStamp = dateFormat.format(Calendar.getInstance().getTime());
-        System.out.println(timeStamp);
 
 
         Callback<Class<?>, Object> controllerFactory = type -> {
@@ -50,8 +49,18 @@ public class Clavardage extends Application {
             }
         };
 
-        connexionWidget.setControllerFactory(controllerFactory);
-        Scene connScene = new Scene(connexionWidget.load(),492,285);
+        connexionWidget.setController(connexionController);
+        Parent p = null;
+        try{
+            System.out.println("Before Login Scene load");
+            p = connexionWidget.load();
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        Scene connScene = new Scene(p,492,285);
+        System.out.println("after Login Scene load");
 
 
         primaryStage.setTitle("Clavardage");
@@ -60,7 +69,6 @@ public class Clavardage extends Application {
             connexionManager.setWork(false);
             Platform.exit();
         });
-
         primaryStage.setScene(connScene);
 //        primaryStage.setScene(new Scene(root.load(),800,600));
         primaryStage.show();
@@ -72,7 +80,7 @@ public class Clavardage extends Application {
     public void stop(){
         System.out.println("Stage is closing");
         connexionManager.setWork(false);
-        System.out.println("Working: " + connexionManager.getWork());
+        connexionManager.sendDisconnect();
         connexionManager = null;
         primaryStage.close();
         primaryStage = null;

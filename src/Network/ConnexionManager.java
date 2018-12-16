@@ -25,7 +25,7 @@ import Model.Message;
  *
  */
 
-public class ConnexionManager extends Thread{
+public class ConnexionManager implements Runnable{
 	private ServerSocket serverSocket = null;
 	private String clientName = null;
 	private Vector<UserChatListener> friendList;
@@ -40,6 +40,7 @@ public class ConnexionManager extends Thread{
 	public ConnexionManager(){
 		super();
 		init();
+
 	}
 
 	private void init(){
@@ -87,7 +88,6 @@ public class ConnexionManager extends Thread{
 			}
 
 		}
-
 		try {
 			serverSocket.close();
 		} catch (IOException e) {
@@ -146,8 +146,9 @@ public class ConnexionManager extends Thread{
 				s = new Socket("localhost", port);
 				UserChatListener u = new UserChatListener(uname,s);
 				sendMessage(s,clientName + "%&%" + "initConnection");
-				u.start();
+                (new Thread(u)).start();
 				this.friendList.add(u);
+				return true;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -167,7 +168,7 @@ public class ConnexionManager extends Thread{
 				case "initConnection": {
 					this.connectedUsers.put(uname,socket.getPort());
 					UserChatListener u = new UserChatListener(uname, socket);
-					u.start();
+                    (new Thread(u)).start();
 					this.friendList.add(u);
 					printUsers();
 				}
@@ -178,14 +179,17 @@ public class ConnexionManager extends Thread{
 				case "disconnect":
 					this.connectedUsers.remove(uname);
 					UserChatListener u = getFriend(uname);
-					u.setWorking(false);
-					try {
-						u.getSocket().close();
-					} catch (IOException e) {
-						System.out.println("Error when disconnecting: msg = [" + msg + "], socket = [" + socket + "]");
-						e.printStackTrace();
-					}
-					this.friendList.remove(u);
+					if(u != null){
+                        u.setWorking(false);
+                        try {
+                            u.getSocket().close();
+                        } catch (IOException e) {
+                            System.out.println("Error when disconnecting: msg = [" + msg + "], socket = [" + socket + "]");
+                            e.printStackTrace();
+                        }
+                        this.friendList.remove(u);
+                        u = null;
+                    }
 					System.out.println("User [" + uname + "] disconnected!!");
 					printUsers();
 					break;
@@ -215,11 +219,11 @@ public class ConnexionManager extends Thread{
 					socket.setSoTimeout(50);
 					BufferedReader entreeDepuisClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					PrintWriter sortieVersClient = new PrintWriter(socket.getOutputStream());
-					sortieVersClient.println("___NONE___" + "%&%" + "scan");
+					sortieVersClient.println(" " + "%&%" + "scan");
 					sortieVersClient.flush();
-					System.out.println("Port " + i + " user number: " + (connectedUsers.size() + 1));
+//					System.out.println("Port " + i + " user number: " + (connectedUsers.size() + 1));
 					String username = entreeDepuisClient.readLine();
-					System.out.println("Il s'appele: " + username);
+					System.out.println("new user: " + username);
 					//User u = new User(username, socket);
 
 					this.connectedUsers.put(username, i);
@@ -254,15 +258,19 @@ public class ConnexionManager extends Thread{
 
 		while(it.hasNext()){
 
-			Map.Entry<String, Integer> e = it.next();
-			try {
-				Socket s = new Socket("localhost",e.getValue());
-				sendMessage(s,msg);
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
-
+            Map.Entry<String, Integer> e = it.next();
+            UserChatListener u = getFriend(e.getKey());
+            try {
+                if(u == null){
+                        Socket s = new Socket("localhost",e.getValue());
+                        sendMessage(s,msg);
+                }
+                else
+                    sendMessage(u.getSocket(),msg);
+            }
+            catch (IOException e1) {
+                e1.printStackTrace();
+            }
 		}
 	}
 
@@ -326,4 +334,35 @@ public class ConnexionManager extends Thread{
 
 		}
 	}
+
+    public Vector<UserChatListener> getFriendList() {
+        return friendList;
+    }
+
+    public Vector<String> getConnectedUsersName(){
+	    Vector<String> res = new Vector<>();
+        Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
+        Iterator<Map.Entry<String, Integer>> it = setHm.iterator();
+
+        while(it.hasNext()){
+
+            Map.Entry<String, Integer> e = it.next();
+            res.add(e.getKey());
+        }
+        return  res;
+    }
+
+    public void sendDisconnect(){
+        for (UserChatListener l: friendList) {
+            l.setWorking(false);
+        }
+	    sendUpdateToConnected(clientName+"%&%"+"disconnect");
+    }
+
+    public void addIncomingMessageListener(String uname,Observer observer){
+	    UserChatListener l = getFriend(uname);
+	    if(uname != null){
+	        l.addObserver(observer);
+        }
+    }
 }

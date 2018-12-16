@@ -4,10 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
+import java.util.Calendar;
+import java.util.Observable;
 
+import Model.Message;
 import Model.User;
 
-public class UserChatListener extends Thread {
+public class UserChatListener extends Observable implements Runnable {
     protected Socket socket;
     protected String nickname;
     private String lastMessage;
@@ -18,34 +22,48 @@ public class UserChatListener extends Thread {
 
     public UserChatListener(User u){
         this.nickname = u.getNickname();
-        this.socket = u.getSocket();
 
     }
     public UserChatListener(String uname, Socket s){
         this.nickname = uname;
         this.socket = s;
     }
+
     @Override
     public void run() {
         while(working){
             try {
                 inputFromFriend = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                System.out.println("before reading: [" + nickname + "]");
                 String msg = inputFromFriend.readLine();
-                if(msg != null){
-                    lastMessage = msg;
-                    asNewMessage = true;
-                    System.out.println("Received [" + lastMessage + "] from User: [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort()  + "]");
-                }
+                if(msg != null)
+                    notifyListeners(msg);
                 else {
                     connected = false;
                     working = false;
                 }
-            } catch (IOException e) {
+            } 
+            catch(SocketException e) {
+                System.out.println("Connexion fermée pendant l'écoute");
+            }
+            catch (IOException e) {
                 e.printStackTrace();
             }
-            if(socket.isClosed())
+            if(socket.isClosed()) {
                 working = false;
+                System.out.println("Closed Socket");
+            }
         }
+        System.out.println("Stopped Listening User: [" + nickname + "]");
+    }
+
+    private void notifyListeners(String msg){
+        lastMessage = msg;
+        asNewMessage = true;
+        System.out.println("Received [" + lastMessage + "] from User: [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort()  + "]");
+        Message m = new Message(nickname, Calendar.getInstance().getTime(),msg,null);
+        setChanged();
+        notifyObservers(m);
     }
 
     public boolean isWorking() {

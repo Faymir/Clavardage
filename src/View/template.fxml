@@ -78,7 +78,7 @@
                                  </image>
                               </ImageView>
                               <Separator prefHeight="4.0" prefWidth="91.0" HBox.hgrow="ALWAYS" />
-                              <Label fx:id="username" alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="54.0" text="none" HBox.hgrow="NEVER" />
+                              <Label fx:id="usernameLabel" alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="54.0" text="none" HBox.hgrow="NEVER" />
                            </children>
                         </HBox>
                         <TabPane fx:id="tabPane" prefHeight="662.0" prefWidth="250.0" tabClosingPolicy="UNAVAILABLE">

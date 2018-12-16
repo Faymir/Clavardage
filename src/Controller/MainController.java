@@ -6,16 +6,13 @@ package Controller;
 import Model.Message;
 import Model.WebViewData;
 import Network.ConnexionManager;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -23,10 +20,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 
-import java.util.Calendar;
-import java.util.Vector;
+import java.util.*;
 
-public class MainController {
+public class MainController implements Observer {
 
     @FXML // fx:id="menuBar"
     private MenuBar menuBar; // Value injected by FXMLLoader
@@ -35,7 +31,7 @@ public class MainController {
     private ImageView userAvatar; // Value injected by FXMLLoader
 
     @FXML // fx:id="username"
-    private Label username; // Value injected by FXMLLoader
+    private Label usernameLabel; // Value injected by FXMLLoader
 
     @FXML // fx:id="tabPane"
     private TabPane tabPane; // Value injected by FXMLLoader
@@ -50,7 +46,7 @@ public class MainController {
     private Tab connectedUsersTab; // Value injected by FXMLLoader
 
     @FXML // fx:id="connectedUsersList"
-    private ListView<?> connectedUsersList; // Value injected by FXMLLoader
+    private ListView<String> connectedUsersList; // Value injected by FXMLLoader
 
     @FXML // fx:id="discussionWebview"
     private WebView discussionWebview; // Value injected by FXMLLoader
@@ -82,6 +78,8 @@ public class MainController {
 
     @FXML
     void initialize(){
+
+        initContextMenu();
         Message m1 = new Message("Haha", Calendar.getInstance().getTime(), "Salut! comment vas tu?", null);
         Message m2 = new Message(null, Calendar.getInstance().getTime(), "Je vais bien et toi?", "Haha");
         Vector<Message> v = new Vector<>();
@@ -90,7 +88,8 @@ public class MainController {
         discussion.setDiscussion(v); 
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
-        username.setText(connManager.getClientName());
+        usernameLabel.setText(connManager.getClientName());
+        this.connectedUsersList.getItems().addAll(connManager.getConnectedUsersName());
     }
 
     @FXML
@@ -118,4 +117,50 @@ public class MainController {
     	}
     }
 
+    private void initContextMenu(){
+        connectedUsersList.setCellFactory(lv -> {
+
+            ListCell<String> cell = new ListCell<>();
+
+            ContextMenu contextMenu = new ContextMenu();
+
+
+            MenuItem editItem = new MenuItem();
+            editItem.textProperty().bind(Bindings.format("Démarrer une discussion"));
+            editItem.setOnAction(event -> {
+                String username = cell.getItem();
+                handleContextMenuClick(username);
+                connectedUsersList.getItems().remove(username);
+            });
+            MenuItem deleteItem = new MenuItem();
+            //TODO: Mettre réellement un utilisateur sur liste noire car on ne fait que le supprimer de la liste et il y apparaitra encore au prochain scan
+            deleteItem.textProperty().bind(Bindings.format("Mettre sur liste noire"));
+            deleteItem.setOnAction(event -> connectedUsersList.getItems().remove(cell.getItem()));
+            contextMenu.getItems().addAll(editItem, deleteItem);
+
+            cell.textProperty().bind(cell.itemProperty());
+
+            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if (isNowEmpty) {
+                    cell.setContextMenu(null);
+                } else {
+                    cell.setContextMenu(contextMenu);
+                }
+            });
+            return cell ;
+        });
+    }
+
+    private void handleContextMenuClick(String uname){
+        friendListVBox.getChildren().add(new Label(uname));
+        if(connManager.initChat(uname)) {
+            System.out.println("Chat démarré avec [" + uname + "]");
+            connManager.addIncomingMessageListener(uname, this);
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        System.out.println("observable = [" + observable.getClass() + "], o = [" + o.toString() + "]");
+    }
 }

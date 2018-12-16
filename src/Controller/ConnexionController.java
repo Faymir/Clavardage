@@ -28,13 +28,15 @@ public class ConnexionController {
     private Label errorLabel;
 
     public ConnexionController(ConnexionManager connexionManager, FXMLLoader mainWindow){
+        System.out.println("Before login init");
         connManager = connexionManager;
         this.mainWindow = mainWindow;
+        System.out.println("After login init");
     }
 
     @FXML
     public void initialize(){
-
+        System.out.println("Initialize");
     }
 
     @FXML
@@ -60,13 +62,14 @@ public class ConnexionController {
             return;
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         if(connManager.isUsed(username)) {
+            errorLabel.setStyle("-fx-text-fill: red");
             errorLabel.setText("This Username is already taken, choose an other one");
         }
         else {
             errorLabel.setStyle("-fx-text-fill: green");
             errorLabel.setText("Username is valid");
             connManager.setClientName(username);
-            connManager.start();
+            (new Thread(connManager)).start();
             Stage stage = (Stage) (usernameTextEdit).getScene().getWindow();
             try {
                 stage.setScene(new Scene(mainWindow.load(),800,600));
