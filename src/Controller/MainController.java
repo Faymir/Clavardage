@@ -83,6 +83,7 @@ public class MainController {
         v.add(m1);
         v.add(m2);
         discussion.setDiscussion(v);
+        
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
     }
