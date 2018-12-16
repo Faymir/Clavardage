@@ -2,3 +2,4 @@
 *.iml
 /.idea/
 .attach_pid*
+*.class
