@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 //        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/template.fxml"));
-        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/connexion.fxml"));
+        FXMLLoader root = new FXMLLoader(getClass().getResource("../View/template.fxml"));
 
         MainController mainController = new MainController();
         ConnexionController connexionController = new ConnexionController();

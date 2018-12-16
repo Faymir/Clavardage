@@ -104,7 +104,7 @@ public class MainController {
     }
 
     @FXML
-    void textFieldKeyRealeased(KeyEvent event) {
+    void textFieldKeyReleased(KeyEvent event) {
     	
     	if( event.getCode().toString().equals("ENTER"))
     	{

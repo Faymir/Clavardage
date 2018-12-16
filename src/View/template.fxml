@@ -116,7 +116,7 @@
                   </AnchorPane>
             <HBox prefHeight="43.0" prefWidth="757.0" VBox.vgrow="NEVER">
               <children>
-                <TextField fx:id="textField" onKeyReleased="#textFieldKeyRealeased" prefHeight="39.0" prefWidth="606.0" HBox.hgrow="ALWAYS">
+                <TextField fx:id="textField" onKeyReleased="#textFieldKeyReleased" prefHeight="39.0" prefWidth="606.0" HBox.hgrow="ALWAYS">
                   <opaqueInsets>
                     <Insets />
                   </opaqueInsets></TextField>
