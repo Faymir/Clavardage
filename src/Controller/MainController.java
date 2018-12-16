@@ -5,6 +5,7 @@ package Controller;
 
 import Model.Message;
 import Model.WebViewData;
+import Network.ConnexionManager;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -72,8 +73,12 @@ public class MainController {
     @FXML // fx:id="rightStatus"
     private Label rightStatus; // Value injected by FXMLLoader
 
+    private ConnexionManager connManager;
+    private WebViewData discussion = new WebViewData();
 
-    WebViewData discussion = new WebViewData();
+    public MainController(ConnexionManager connexionManager){
+        this.connManager = connexionManager;
+    }
 
     @FXML
     void initialize(){
@@ -85,6 +90,7 @@ public class MainController {
         discussion.setDiscussion(v); 
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
+        username.setText(connManager.getClientName());
     }
 
     @FXML

@@ -29,7 +29,9 @@ public class Message {
     public String getSender() {
         return from;
     }
-
+    public String getReceiver() {
+        return this.to;
+    }
     public void setSender(String from) {
         this.from = from;
     }
@@ -49,4 +51,5 @@ public class Message {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

@@ -1,25 +1,79 @@
 package Controller;
+
+import Network.ConnexionManager;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.control.BottomNavigation;
-import com.gluonhq.charm.glisten.control.BottomNavigationButton;
-import com.gluonhq.charm.glisten.control.Icon;
-import com.gluonhq.charm.glisten.mvc.View;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+
 public class ConnexionController {
 
+    private ConnexionManager connManager;
+    private FXMLLoader mainWindow;
     @FXML
-    private TextField usernameTextField;
+    private ProgressBar progressBar;
 
     @FXML
-    void CancelClicked(MouseEvent event) {
-        System.out.println("event = [" + event.getSource().toString() + "]");
+    private TextField usernameTextEdit;
+
+    @FXML
+    private Label errorLabel;
+
+    public ConnexionController(ConnexionManager connexionManager, FXMLLoader mainWindow){
+        connManager = connexionManager;
+        this.mainWindow = mainWindow;
     }
 
     @FXML
-    void validerClicked(MouseEvent event) {
-        System.out.println("event = [" + event.getSource().toString() + "]");
+    public void initialize(){
+
+    }
+
+    @FXML
+    void cancelClicked(ActionEvent event) {
+
+        progressBar.setProgress(0);
+    }
+
+    @FXML
+    void usernameKeyReleased(KeyEvent event){
+        if(event.getCode().getName().equals("Enter"))
+            validate();
+    }
+
+    @FXML
+    void validateClicked(ActionEvent event) {
+        validate();
+    }
+
+    private void validate(){
+        String username = usernameTextEdit.getText();
+        if(username.isEmpty())
+            return;
+        progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        if(connManager.isUsed(username)) {
+            errorLabel.setText("This Username is already taken, choose an other one");
+        }
+        else {
+            errorLabel.setStyle("-fx-text-fill: green");
+            errorLabel.setText("Username is valid");
+            connManager.setClientName(username);
+            connManager.start();
+            Stage stage = (Stage) (usernameTextEdit).getScene().getWindow();
+            try {
+                stage.setScene(new Scene(mainWindow.load(),800,600));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
