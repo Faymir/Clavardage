@@ -90,12 +90,6 @@ public class MainController implements Observer {
     void initialize(){
 
         initContextMenu();
-        Message m1 = new Message("Haha", Calendar.getInstance().getTime(), "Salut! comment vas tu?", null);
-        Message m2 = new Message(null, Calendar.getInstance().getTime(), "Je vais bien et toi?", "Haha");
-        Vector<Message> v = new Vector<>();
-        v.add(m1);
-        v.add(m2);
-        discussion.setDiscussion(v); 
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
         usernameLabel.setText(connManager.getClientName());
@@ -120,8 +114,12 @@ public class MainController implements Observer {
     void sendClicked(ActionEvent event) {
         if(textField.getText().isEmpty())
             return;
-        Message m = new Message(null, Calendar.getInstance().getTime(), textField.getText(), "haha");
+        String actualFriendName = getActualFriend();
+        if (actualFriendName == null)
+            System.out.println("actualFriend Error = [" + actualFriendName + "]");
+        Message m = new Message(connManager.getClientName(), Calendar.getInstance().getTime(), textField.getText(), actualFriendName);
         textField.clear();
+        connManager.sendMessage(m);
         discussion.addMessage(m,true);
         discussionWebview.getEngine().loadContent(discussion.getHtml());
         //discussionWebview.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
@@ -201,57 +199,76 @@ public class MainController implements Observer {
         return null;
     }
 
-    private void handleNewConnection(Signal s){
-        this.connectedUsersList.getItems().removeIf(e ->  e.equals(s.message));
-        this.connectedUsersList.getItems().add(s.message);
+    private String getActualFriend(){
+        for (FriendViewController u: friendViews) {
+            if(u.isSelected())
+                return u.getNickname();
+        }
+        return  null;
     }
 
-    private void handleinitChat(Signal s){
-        //TODO: not finished not yet working: when received message from server that someone want to chat
-        System.out.println("removed = [" + connectedUsersList.getItems().remove(s.message) + "]");
-        Label l = new Label(s.message);
-        l.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                User u = getFriend(s.message);
-                if (u == null){
-                    u = new User(s.message);
+    private void handleNewConnection(Signal s){
+        this.connectedUsersList.getItems().remove(s.message);
+        Platform.runLater(
+                () -> {
+                    // Update UI here.
+                    this.connectedUsersList.getItems().add(s.message);
                 }
-                for (User friend: friends) {
-                    friend.deleteObservers();
-                }
-//                u.addObserver(this);
-            }
-        });
-//        this.friendListVBox.getChildren().add();
+        );
     }
+
+//    private void handleinitChat(Signal s){
+//        //TODO: not finished not yet working: when received message from server that someone want to chat
+//        Label l = new Label(s.message);
+//        l.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent mouseEvent) {
+//                User u = getFriend(s.message);
+//                if (u == null){
+//                    u = new User(s.message);
+//                }
+//                for (User friend: friends) {
+//                    friend.deleteObservers();
+//                }
+////                u.addObserver(this);
+//            }
+//        });
+////        this.friendListVBox.getChildren().add();
+//    }
 
     private void initChat(String username){
         //TODO: not finished: must init listeners, observers, and a user
+    	Platform.runLater(
+                () -> {
+                    // Update UI here.
+                    System.out.println("removed from initchat = [" + connectedUsersList.getItems().remove(username) + "]");
+                }
+        );
         User friend = getFriend(username);
         if(friend == null){
             friend = new User(username);
-            connManager.addIncomingMessageListener(username,friend);
+            friends.add(friend);
             FriendViewController c = new FriendViewController(username);
+            friendViews.add(c);
 
+            connManager.addIncomingMessageListener(username,friend);
             c.addObserver(this);
             friend.addObserver(c);
 
-            friendViews.add(c);
             FXMLLoader view = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
             view.setController(c);
 
-                // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
-                Platform.runLater(
-                        () -> {
-                            // Update UI here.
-                            try {
-                                friendListVBox.getChildren().add(view.load());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+            // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+            Platform.runLater(
+                    () -> {
+                        // Update UI here.
+                        try {
+                            friendListVBox.getChildren().add(view.load());
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                );
+                    }
+            );
         }
 
         connManager.addObserver(friend);
@@ -290,20 +307,22 @@ public class MainController implements Observer {
                     if (c.getNickname() != s.message)
                         c.unselect();
                 }
-                try {
-                    User u = getFriend(s.message);
-                    if (u != null)
-                        discussion.setDiscussion(u.getDiscussion());
-                    else {
-                        System.out.println("SHIT HAPPENS IN SHOW DISCUSSION  observable = [" + observable + "], o = [" + o + "] ");
-                        System.exit(-6);
-                    }
+                User u = getFriend(s.message);
+                if (u != null) {
+//                    Message m1 = new Message("Test", Calendar.getInstance().getTime(), "Un test", null);
+//                    u.addMessage(m1);
+                    discussion = new WebViewData(u.getDiscussion());
                 }
-                catch (InvocationTargetException ex) {
-                    System.out.println("observable = [" + observable + "], o = [" + o + "]" + "oops!" + ex.getCause());
+                else {
+                    System.out.println("SHIT HAPPENS IN SHOW DISCUSSION  observable = [" + observable + "], s.type = [" + s.type + "] s.message [" + s.message + "]");
+                    System.exit(-6);
                 }
-                discussion.loadDiscussion();
-                discussionWebview.getEngine().loadContent(discussion.getHtml());
+                Platform.runLater(
+                        () -> {
+                            // Update UI here.
+                                discussionWebview.getEngine().loadContent(discussion.getHtml());
+                        }
+                );
             }
         }
         else if(observable.getClass() == User.class){

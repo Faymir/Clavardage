@@ -33,6 +33,8 @@ import Model.Type;
  * 		=> le démarrage d'une nouvelle discussion
  * 		=> la déconnexion d'un utlilisateur
  *
+ * notifie un User pour lui signaler q'on vient de se connecter, déconnecter
+ *
  * 	Permet aussi de se brancher a la UserListener pour ecouter l'arrivée de nouveaux messages
  */
 
@@ -160,8 +162,8 @@ public class ConnexionManager extends Observable implements Runnable{
 				sendMessage(s,clientName + "%&%" + "initConnection");
                 (new Thread(u)).start();
 				this.friendList.add(u);
-                setChanged();
-                notifyObservers(new Signal(Type.INIT_CHAT, uname));
+//                setChanged();
+//                notifyObservers(new Signal(Type.INIT_CHAT, uname));
 				return true;
 			} catch (IOException e) {
 				e.printStackTrace();

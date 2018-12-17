@@ -1,5 +1,7 @@
 package Model;
 
+import Network.UserChatListener;
+
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
@@ -34,9 +36,11 @@ public class User extends Observable implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        this.discussion.add((Message)o);
-        setChanged();
-        notifyObservers(new Signal(Type.NEW_MESSAGE, lastMessageIndex));
+        if (observable.getClass() == UserChatListener.class) {
+            this.discussion.add((Message) o);
+            setChanged();
+            notifyObservers(new Signal(Type.NEW_MESSAGE, lastMessageIndex));
+        }
     }
 
 
@@ -64,6 +68,10 @@ public class User extends Observable implements Observer {
 
     public void setDiscussion(Vector<Message> discussion) {
         this.discussion = discussion;
+    }
+
+    public void addMessage(Message m){
+        discussion.add(m);
     }
 
 

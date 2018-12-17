@@ -20,8 +20,7 @@ public class Clavardage extends Application {
         connexionManager = new ConnexionManager();
         primaryStage = stage;
         //UI INIT
-        String current = System.getProperty("user.dir") + "/src/Controller/View/";
-        System.out.println(current);
+//        String current = System.getProperty("user.dir") + "/src/Controller/View/";
         FXMLLoader root = new FXMLLoader(getClass().getResource("View/template.fxml"));
         MainController mainController = new MainController(connexionManager);
         root.setController(mainController);
@@ -50,7 +49,6 @@ public class Clavardage extends Application {
         connexionWidget.setController(connexionController);
         Parent p = null;
         try{
-            System.out.println("Before Login Scene load");
             p = connexionWidget.load();
         }
         catch (IOException e){
@@ -58,7 +56,6 @@ public class Clavardage extends Application {
             System.exit(-1);
         }
         Scene connScene = new Scene(p,492,285);
-        System.out.println("after Login Scene load");
 
 
         primaryStage.setTitle("Clavardage");

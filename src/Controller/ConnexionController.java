@@ -28,15 +28,13 @@ public class ConnexionController {
     private Label errorLabel;
 
     public ConnexionController(ConnexionManager connexionManager, FXMLLoader mainWindow){
-        System.out.println("Before login init");
         connManager = connexionManager;
         this.mainWindow = mainWindow;
-        System.out.println("After login init");
     }
 
     @FXML
     public void initialize(){
-        System.out.println("Initialize");
+        System.out.println("Initialize connexion window");
     }
 
     @FXML

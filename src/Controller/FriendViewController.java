@@ -89,6 +89,10 @@ public class FriendViewController extends Observable implements Observer {
         friendView.setStyle("-fx-fill: lightblue");
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
     @Override
     public void update(Observable observable, Object o) {
         //TODO afficher le nombre de nouveaux messages
