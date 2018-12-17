@@ -3,12 +3,10 @@ package Controller;
  * Sample Skeleton for 'template.fxml' Controller Class
  */
 
-import Model.Message;
-import Model.Signal;
-import Model.User;
-import Model.WebViewData;
+import Model.*;
 import Network.ConnexionManager;
 import com.sun.xml.internal.bind.v2.TODO;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,6 +23,7 @@ import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class MainController implements Observer {
@@ -75,12 +74,16 @@ public class MainController implements Observer {
     private Label rightStatus; // Value injected by FXMLLoader
 
     private ConnexionManager connManager;
-    private WebViewData discussion = new WebViewData();
+    private WebViewData discussion;
     private Vector<User> friends;
+    private Vector<FriendViewController> friendViews;
 
     public MainController(ConnexionManager connexionManager){
         this.connManager = connexionManager;
         connexionManager.addObserver(this);
+        friends = new Vector<>();
+        friendViews = new Vector<>();
+        discussion = new WebViewData();
     }
 
     @FXML
@@ -97,20 +100,20 @@ public class MainController implements Observer {
         discussionWebview.getEngine().loadContent(discussion.getHtml());
         usernameLabel.setText(connManager.getClientName());
         this.connectedUsersList.getItems().addAll(connManager.getConnectedUsersName());
-
-        FXMLLoader friend = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
-        FriendViewController c = new FriendViewController("Faymir");
-        friend.setController(c);
-
-        try {
-            this.friendListVBox.getChildren().add(friend.load());
-            friend = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
-            c = new FriendViewController("ffbv");
-            friend.setController(c);
-            this.friendListVBox.getChildren().add(friend.load());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//
+//        FXMLLoader friend = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
+//        FriendViewController c = new FriendViewController("Faymir");
+//        friend.setController(c);
+//
+//        try {
+//            this.friendListVBox.getChildren().add(friend.load());
+//            friend = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
+//            c = new FriendViewController("ffbv");
+//            friend.setController(c);
+//            this.friendListVBox.getChildren().add(friend.load());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @FXML
@@ -151,7 +154,6 @@ public class MainController implements Observer {
             editItem.setOnAction(event -> {
                 String username = cell.getItem();
                 handleContextMenuClick(username);
-                connectedUsersList.getItems().remove(username);
             });
             MenuItem deleteItem = new MenuItem();
             //TODO: Mettre réellement un utilisateur sur liste noire car on ne fait que le supprimer de la liste et il y apparaitra encore au prochain scan
@@ -175,9 +177,9 @@ public class MainController implements Observer {
     }
 
     private void handleContextMenuClick(String uname){
-        friendListVBox.getChildren().add(new Label(uname));
+        //friendListVBox.getChildren().add(new Label(uname));
         if(connManager.initChat(uname)) {
-            System.out.println("Start chatting with [" + uname + "]");
+            initChat(uname);
         }
     }
 
@@ -190,7 +192,17 @@ public class MainController implements Observer {
         return null;
     }
 
+    private FriendViewController getFriendView(String uname){
+        for (FriendViewController u: friendViews) {
+            if(u.getNickname().equals(uname))
+                return u;
+        }
+
+        return null;
+    }
+
     private void handleNewConnection(Signal s){
+        this.connectedUsersList.getItems().removeIf(e ->  e.equals(s.message));
         this.connectedUsersList.getItems().add(s.message);
     }
 
@@ -216,6 +228,34 @@ public class MainController implements Observer {
 
     private void initChat(String username){
         //TODO: not finished: must init listeners, observers, and a user
+        User friend = getFriend(username);
+        if(friend == null){
+            friend = new User(username);
+            connManager.addIncomingMessageListener(username,friend);
+            FriendViewController c = new FriendViewController(username);
+
+            c.addObserver(this);
+            friend.addObserver(c);
+
+            friendViews.add(c);
+            FXMLLoader view = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
+            view.setController(c);
+
+                // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+                Platform.runLater(
+                        () -> {
+                            // Update UI here.
+                            try {
+                                friendListVBox.getChildren().add(view.load());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                );
+        }
+
+        connManager.addObserver(friend);
+
 //        friendListVBox.getChildren().
         //TODO: Create listof FriendView , push new initCHat to it if not exist
         // TODO: create related user if not exist
@@ -232,6 +272,7 @@ public class MainController implements Observer {
                     handleNewConnection(s);
                     break;
                 case INIT_CHAT:
+                    initChat(s.message);
                     break;
                 case DISCONNECT:
                     break;
@@ -241,9 +282,34 @@ public class MainController implements Observer {
         }
         else if(observable.getClass() == FriendViewController.class){
             //TODO: create related method when select a user from list
+            
+            Signal s = (Signal) o;
+            if(s.type == Type.SHOW_DISCUSSION){
+                FriendViewController view = null;
+                for (FriendViewController c: friendViews) {
+                    if (c.getNickname() != s.message)
+                        c.unselect();
+                }
+                try {
+                    User u = getFriend(s.message);
+                    if (u != null)
+                        discussion.setDiscussion(u.getDiscussion());
+                    else {
+                        System.out.println("SHIT HAPPENS IN SHOW DISCUSSION  observable = [" + observable + "], o = [" + o + "] ");
+                        System.exit(-6);
+                    }
+                }
+                catch (InvocationTargetException ex) {
+                    System.out.println("observable = [" + observable + "], o = [" + o + "]" + "oops!" + ex.getCause());
+                }
+                discussion.loadDiscussion();
+                discussionWebview.getEngine().loadContent(discussion.getHtml());
+            }
         }
         else if(observable.getClass() == User.class){
             //TODO: create methods to update view on new message if this user is the current selected and showed on webview
+
+            //TODO: afficher une icone représentant le nombre de nouveau messages
         }
     }
 }

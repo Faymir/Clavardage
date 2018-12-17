@@ -27,6 +27,16 @@ import Model.Type;
  *
  */
 
+/**
+ * notifie la MainController pour lui signaler de se mettre a jour par rapport à
+ * 		=> l'arrivée d'un nouvel utilisateur
+ * 		=> le démarrage d'une nouvelle discussion
+ * 		=> la déconnexion d'un utlilisateur
+ *
+ * 	Permet aussi de se brancher a la UserListener pour ecouter l'arrivée de nouveaux messages
+ */
+
+
 public class ConnexionManager extends Observable implements Runnable{
 	private ServerSocket serverSocket = null;
 	private String clientName = null;

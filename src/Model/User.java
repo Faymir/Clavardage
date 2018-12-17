@@ -5,6 +5,13 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
+/**
+ * Se met en ecoute par rapport à un UserListener pour savoir si il y a  des nouveaux messages
+ *
+ * notifie la friendViewController pour lui signaler de se mettre a jour par rapport à l'affichage d'une notification
+ */
+
+
 public class User extends Observable implements Observer {
 
     protected String nickname;
@@ -29,7 +36,7 @@ public class User extends Observable implements Observer {
     public void update(Observable observable, Object o) {
         this.discussion.add((Message)o);
         setChanged();
-        notifyObservers(lastMessageIndex);
+        notifyObservers(new Signal(Type.NEW_MESSAGE, lastMessageIndex));
     }
 
 

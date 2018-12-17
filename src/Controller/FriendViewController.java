@@ -2,7 +2,11 @@ package Controller;
 
 import java.net.URL;
 import java.util.Observable;
+import java.util.Observer;
 import java.util.ResourceBundle;
+
+import Model.Signal;
+import Model.Type;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Effect;
@@ -11,7 +15,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
-public class FriendViewController extends Observable {
+
+/**
+ * Se met en ecoute par rapport à un utilisateur pour savoir si il a recu des nouveaux messages
+ *
+ * notifie le main controller pour lui signaler de mettre a jour la webview et soit
+ *      => afficher le nouveau message si c'est la discussion actuelle qui est visualisée
+ *      => soit charger la discussion actuelle dans la webview
+ */
+public class FriendViewController extends Observable implements Observer {
 
     @FXML
     private ResourceBundle resources;
@@ -34,13 +46,14 @@ public class FriendViewController extends Observable {
     @FXML
     void friendViewClicked(MouseEvent event) {
         System.out.println("event = [" + event + "]");
-        friendView.setEffect(new SepiaTone());
-        friendView.setStyle("-fx-border-color: blue");
+        this.select();
+        setChanged();
+        notifyObservers(new Signal(Type.SHOW_DISCUSSION,nickname));
 
     }
 
     private String nickname;
-    private boolean status;
+    private boolean selected = false;
 
     public FriendViewController(String nickname){
         this.nickname = nickname;
@@ -57,5 +70,31 @@ public class FriendViewController extends Observable {
 
     public void setNickname(String nickname){
         this.nickname = nickname;
+    }
+
+    public String getNickname(){
+        return  this.nickname;
+    }
+
+    public void unselect(){
+        this.selected = false;
+        friendView.setStyle("-fx-border-color: inherit");
+        friendView.setEffect(null);
+    }
+
+    public void select(){
+        this.selected = true;
+        //friendView.setEffect(new SepiaTone());
+        friendView.setStyle("-fx-border-color: blue");
+        friendView.setStyle("-fx-fill: lightblue");
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        //TODO afficher le nombre de nouveaux messages
+        if(this.selected){
+            setChanged();
+            notifyObservers(new Signal(Type.SHOW_DISCUSSION,nickname));
+        }
     }
 }

@@ -3,3 +3,5 @@
 /.idea/
 .attach_pid*
 *.class
+.classpath
+*.eml
