@@ -9,11 +9,13 @@ import Model.Signal;
 import Model.Type;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.SepiaTone;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 
 
 /**
@@ -45,7 +47,7 @@ public class FriendViewController extends Observable implements Observer {
 
     @FXML
     void friendViewClicked(MouseEvent event) {
-        System.out.println("event = [" + event + "]");
+//        System.out.println("event = [" + event + "]");
         this.select();
         setChanged();
         notifyObservers(new Signal(Type.SHOW_DISCUSSION,nickname));
@@ -84,9 +86,17 @@ public class FriendViewController extends Observable implements Observer {
 
     public void select(){
         this.selected = true;
-        //friendView.setEffect(new SepiaTone());
+//        int depth = 70;
+//        DropShadow borderGlow= new DropShadow();
+//        borderGlow.setOffsetY(0f);
+//        borderGlow.setOffsetX(0f);
+//        borderGlow.setColor(Color.RED);
+//        borderGlow.setWidth(depth);
+//        borderGlow.setHeight(depth);
+//        friendView.setEffect(borderGlow);
+        friendView.setEffect(new SepiaTone());
         friendView.setStyle("-fx-border-color: blue");
-        friendView.setStyle("-fx-fill: lightblue");
+        //friendView.setStyle("-fx-fill: lightblue");
     }
 
     public boolean isSelected() {

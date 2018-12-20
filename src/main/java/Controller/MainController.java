@@ -269,9 +269,11 @@ public class MainController implements Observer {
                         }
                     }
             );
+            connManager.addObserver(friend);
+        }else{
+            connManager.addIncomingMessageListener(username, friend);
         }
 
-        connManager.addObserver(friend);
 
 //        friendListVBox.getChildren().
         //TODO: Create listof FriendView , push new initCHat to it if not exist

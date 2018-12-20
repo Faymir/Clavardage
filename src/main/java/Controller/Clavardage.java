@@ -21,11 +21,11 @@ public class Clavardage extends Application {
         primaryStage = stage;
         //UI INIT
 //        String current = System.getProperty("user.dir") + "/src/Controller/View/";
-        FXMLLoader root = new FXMLLoader(getClass().getResource("View/template.fxml"));
+        FXMLLoader root = new FXMLLoader(getClass().getResource("../template.fxml"));
         MainController mainController = new MainController(connexionManager);
         root.setController(mainController);
 
-        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("View/connexionWidget.fxml"));
+        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("../connexionWidget.fxml"));
         ConnexionController connexionController = new ConnexionController(connexionManager, root);
         UsersList usersList = new UsersList();
 
