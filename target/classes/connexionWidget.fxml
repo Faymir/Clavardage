@@ -36,7 +36,7 @@
                         <Separator opacity="0.0" orientation="VERTICAL" prefHeight="26.0" prefWidth="25.0" />
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <CheckBox mnemonicParsing="false" text="mode production ?">
+                              <CheckBox fx:id="modeCheckBox" mnemonicParsing="false" onAction="#checkBoxClicked" text="mode production ?">
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
