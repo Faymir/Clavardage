@@ -3,6 +3,7 @@ package Controller;
 import Model.Signal;
 import Model.Type;
 import Network.ConnexionManager;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -71,8 +72,8 @@ public class ConnexionController implements Observer
             return;
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         usernameTextEdit.setDisable(true);
-        connManager.isUsed(username);
         connManager.addObserver(this);
+        connManager.isUsed(username);
     }
 
     @Override
@@ -81,21 +82,35 @@ public class ConnexionController implements Observer
             usernameTextEdit.setDisable(false);
             Signal s = (Signal) o;
             if (s.type == Type.BAD_USERNAME) {
-                errorLabel.setStyle("-fx-text-fill: red");
-                errorLabel.setText("This Username is already taken, choose an other one");
+                Platform.runLater(
+                        () -> {
+                            errorLabel.setStyle("-fx-text-fill: red");
+                            errorLabel.setText("This Username is already taken, choose an other one");
+                        }
+                );
             } else if (s.type == Type.GOOD_USERNAME) {
                 String username = usernameTextEdit.getText();
-                progressBar.setProgress(0);
-                errorLabel.setStyle("-fx-text-fill: green");
-                errorLabel.setText("Username is valid");
+                Platform.runLater(
+                        () -> {
+                            // Update UI here.
+                            progressBar.setProgress(0);
+                            errorLabel.setStyle("-fx-text-fill: green");
+                            errorLabel.setText("Username is valid");
+                        }
+                );
                 connManager.setClientName(username);
                 (new Thread(connManager)).start();
                 Stage stage = (Stage) (usernameTextEdit).getScene().getWindow();
-                try {
-                    stage.setScene(new Scene(mainWindow.load(),800,600));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
+                    Platform.runLater(
+                            () -> {
+                                try {
+                                    stage.setScene(new Scene(mainWindow.load(),800,600));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                    );
             }
         }
     }
