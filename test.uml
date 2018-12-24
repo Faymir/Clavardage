@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="324.5" y="431.0">Model.WebViewData</node>
+    <node x="822.3116090880795" y="720.0">Network.UserChatListener</node>
+    <node x="322.4207360722065" y="1568.0">Controller.MainController</node>
+    <node x="861.9207360722065" y="1958.0">Controller.Clavardage</node>
+    <node x="145.04573607220652" y="182.5">Model.Signal</node>
+    <node x="798.0616090880795" y="986.0">Network.ConnexionManager</node>
+    <node x="10.5" y="1124.0">Controller.FriendViewController</node>
+    <node x="812.271926548397" y="1648.5">Controller.ConnexionController</node>
+    <node x="582.5119047619047" y="113.0">Model.Message</node>
+    <node x="215.1369047619047" y="0.0">Model.Type</node>
+    <node x="639.5" y="408.0">Model.User</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Controller.MainController" target="Model.User">
+      <point x="55.178571428571445" y="-165.0" />
+      <point x="532.099307500778" y="1508.0" />
+      <point x="701.6576408341111" y="1508.0" />
+      <point x="701.6576408341111" y="695.0" />
+      <point x="666.1999999999999" y="695.0" />
+      <point x="-106.80000000000001" y="131.0" />
+    </edge>
+    <edge source="Model.User" target="Network.UserChatListener">
+      <point x="106.8000000000001" y="131.0" />
+      <point x="879.8000000000001" y="695.0" />
+      <point x="917.5616090880795" y="695.0" />
+      <point x="-31.75" y="-108.0" />
+    </edge>
+    <edge source="Network.ConnexionManager" target="Network.UserChatListener">
+      <point x="30.25" y="-246.0" />
+      <point x="1009.8116090880795" y="961.0" />
+      <point x="1033.9782757547462" y="961.0" />
+      <point x="84.66666666666669" y="108.0" />
+    </edge>
+    <edge source="Controller.FriendViewController" target="Model.Signal">
+      <point x="67.75" y="-108.0" />
+      <point x="213.75" y="961.0" />
+      <point x="155.55764083411123" y="961.0" />
+      <point x="155.55764083411123" y="388.0" />
+      <point x="167.54573607220652" y="388.0" />
+      <point x="-67.5" y="38.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Model.WebViewData">
+      <point x="11.035714285714334" y="-165.0" />
+      <point x="487.95645035792086" y="1538.0" />
+      <point x="470.0576408341112" y="1538.0" />
+      <point x="470.0576408341112" y="695.0" />
+      <point x="545.0" y="695.0" />
+      <point x="73.5" y="108.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Controller.FriendViewController">
+      <point x="-121.39285714285711" y="-165.0" />
+      <point x="355.5278789293494" y="1538.0" />
+      <point x="55.66666666666663" y="1538.0" />
+      <point x="-90.33333333333337" y="108.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Model.Signal">
+      <point x="-55.178571428571445" y="-165.0" />
+      <point x="421.7421646436351" y="1508.0" />
+      <point x="292.0" y="1508.0" />
+      <point x="292.0" y="388.0" />
+      <point x="212.54573607220652" y="388.0" />
+      <point x="-22.5" y="38.0" />
+    </edge>
+    <edge source="Network.ConnexionManager" target="Model.Message">
+      <point x="90.75" y="-246.0" />
+      <point x="1070.3116090880794" y="961.0" />
+      <point x="1086.8116090880794" y="961.0" />
+      <point x="1086.8116090880794" y="358.0" />
+      <point x="842.2341269841269" y="358.0" />
+      <point x="122.2222222222222" y="107.5" />
+    </edge>
+    <edge source="Network.ConnexionManager" target="Model.Signal">
+      <point x="-151.25" y="-246.0" />
+      <point x="828.3116090880795" y="961.0" />
+      <point x="303.0" y="961.0" />
+      <point x="303.0" y="378.0" />
+      <point x="257.54573607220664" y="378.0" />
+      <point x="22.500000000000114" y="38.0" />
+    </edge>
+    <edge source="Network.ConnexionManager" target="Model.Type">
+      <point x="151.25" y="-246.0" />
+      <point x="1130.8116090880794" y="961.0" />
+      <point x="1097.8116090880794" y="961.0" />
+      <point x="1097.8116090880794" y="83.0" />
+      <point x="343.47023809523796" y="83.0" />
+      <point x="58.33333333333326" y="26.5" />
+    </edge>
+    <edge source="Controller.ConnexionController" target="Network.ConnexionManager">
+      <point x="-95.0" y="-84.5" />
+      <point x="907.271926548397" y="1548.0" />
+      <point x="949.3116090880795" y="1548.0" />
+      <point x="-30.25" y="246.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Model.Message">
+      <point x="33.10714285714289" y="-165.0" />
+      <point x="510.0278789293494" y="1498.0" />
+      <point x="629.0" y="1498.0" />
+      <point x="629.0" y="388.0" />
+      <point x="689.4563492063492" y="388.0" />
+      <point x="-30.555555555555543" y="107.5" />
+    </edge>
+    <edge source="Model.User" target="Model.Signal">
+      <point x="-100.125" y="-131.0" />
+      <point x="672.875" y="348.0" />
+      <point x="302.54573607220664" y="348.0" />
+      <point x="67.50000000000011" y="38.0" />
+    </edge>
+    <edge source="Model.WebViewData" target="Model.Message">
+      <point x="73.5" y="-108.0" />
+      <point x="545.0" y="378.0" />
+      <point x="658.9007936507936" y="378.0" />
+      <point x="-61.111111111111086" y="107.5" />
+    </edge>
+    <edge source="Controller.Clavardage" target="Controller.ConnexionController">
+      <point x="14.333333333333314" y="-49.5" />
+      <point x="962.2540694055399" y="1918.0" />
+      <point x="1097.271926548397" y="1918.0" />
+      <point x="95.0" y="84.5" />
+    </edge>
+    <edge source="Model.User" target="Model.Type">
+      <point x="100.12500000000003" y="-131.0" />
+      <point x="873.125" y="388.0" />
+      <point x="868.0119047619047" y="388.0" />
+      <point x="868.0119047619047" y="93.0" />
+      <point x="320.1369047619047" y="93.0" />
+      <point x="35.0" y="26.5" />
+    </edge>
+    <edge source="Network.UserChatListener" target="Model.User">
+      <point x="-95.25" y="-108.0" />
+      <point x="854.0616090880795" y="695.0" />
+      <point x="826.4" y="695.0" />
+      <point x="53.39999999999998" y="131.0" />
+    </edge>
+    <edge source="Controller.FriendViewController" target="Model.Type">
+      <point x="-67.75" y="-108.0" />
+      <point x="78.25" y="961.0" />
+      <point x="122.18264083411111" y="961.0" />
+      <point x="122.18264083411111" y="83.0" />
+      <point x="250.1369047619047" y="83.0" />
+      <point x="-35.0" y="26.5" />
+    </edge>
+    <edge source="Controller.Clavardage" target="Network.ConnexionManager">
+      <point x="71.66666666666669" y="-49.5" />
+      <point x="1019.5874027388732" y="1938.0" />
+      <point x="1213.771926548397" y="1938.0" />
+      <point x="1213.771926548397" y="1528.0" />
+      <point x="1130.8116090880794" y="1528.0" />
+      <point x="151.25" y="246.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Network.ConnexionManager">
+      <point x="121.39285714285711" y="-165.0" />
+      <point x="598.3135932150636" y="1538.0" />
+      <point x="828.3116090880795" y="1538.0" />
+      <point x="-151.25" y="246.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Model.Type">
+      <point x="-143.46428571428578" y="-165.0" />
+      <point x="333.45645035792074" y="1548.0" />
+      <point x="0.0" y="1548.0" />
+      <point x="0.0" y="73.0" />
+      <point x="226.80357142857133" y="73.0" />
+      <point x="-58.33333333333337" y="26.5" />
+    </edge>
+    <edge source="Model.Signal" target="Model.Type">
+      <point x="-44.999999999999886" y="-38.0" />
+      <point x="190.04573607220664" y="93.0" />
+      <point x="273.4702380952381" y="93.0" />
+      <point x="-11.666666666666629" y="26.5" />
+    </edge>
+    <edge source="Model.User" target="Model.Message">
+      <point x="-33.375" y="-131.0" />
+      <point x="739.625" y="388.0" />
+      <point x="720.0119047619047" y="388.0" />
+      <point x="0.0" y="107.5" />
+    </edge>
+    <edge source="Network.UserChatListener" target="Model.Message">
+      <point x="95.25" y="-108.0" />
+      <point x="1044.5616090880794" y="695.0" />
+      <point x="1007.2916666666666" y="695.0" />
+      <point x="1007.2916666666666" y="368.0" />
+      <point x="811.6785714285713" y="368.0" />
+      <point x="91.66666666666663" y="107.5" />
+    </edge>
+    <edge source="Controller.Clavardage" target="Controller.MainController">
+      <point x="-43.00000000000003" y="-49.5" />
+      <point x="904.9207360722065" y="1928.0" />
+      <point x="554.1707360722065" y="1928.0" />
+      <point x="77.25" y="165.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.9447340980187694" x="428.3904036582619" y="598.2074685711684" />
+  <SelectedNodes>
+    <node>Model.WebViewData</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

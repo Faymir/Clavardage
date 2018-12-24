@@ -1,3 +1,8 @@
-/*.class
-/*.iml
-/.idea
+/out/
+*.iml
+/.idea/
+.attach_pid*
+*.class
+.classpath
+*.eml
+/target/
