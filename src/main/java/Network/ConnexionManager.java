@@ -202,6 +202,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
                 sendMessage(s,clientName + "%&%" + "initConnection");
                 (new Thread(u)).start();
                 this.friendList.add(u);
+                return true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -474,13 +475,25 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 
     public Vector<String> getConnectedUsersName(){
 	    Vector<String> res = new Vector<>();
-        Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
-        Iterator<Map.Entry<String, Integer>> it = setHm.iterator();
+        if (mode == ManagerMode.TEST) {
+            Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
+            Iterator<Map.Entry<String, Integer>> it = setHm.iterator();
 
-        while(it.hasNext()){
+            while(it.hasNext()){
 
-            Map.Entry<String, Integer> e = it.next();
-            res.add(e.getKey());
+                Map.Entry<String, Integer> e = it.next();
+                res.add(e.getKey());
+            }
+        }
+        else if (mode == ManagerMode.BROADCAST){
+            Set<Map.Entry<String, String>> setHm = connectedUsers2.entrySet();
+            Iterator<Map.Entry<String, String>> it = setHm.iterator();
+
+            while(it.hasNext()){
+
+                Map.Entry<String, String> e = it.next();
+                res.add(e.getKey());
+            }
         }
         return  res;
     }

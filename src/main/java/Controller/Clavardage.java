@@ -17,7 +17,7 @@ public class Clavardage extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         //Classes Init
-        connexionManager = new ConnexionManager(ConnexionManager.ManagerMode.TEST);
+        connexionManager = new ConnexionManager(ConnexionManager.ManagerMode.BROADCAST);
         primaryStage = stage;
         //UI INIT
 //        String current = System.getProperty("user.dir") + "/src/Controller/View/";

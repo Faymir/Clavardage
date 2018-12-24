@@ -60,7 +60,7 @@ public class UserChatListener extends Observable implements Runnable {
     private void notifyListeners(String msg){
         lastMessage = msg;
         asNewMessage = true;
-        System.out.println("Received [" + lastMessage + "] from User: [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort()  + "]");
+        System.out.println("Received [" + lastMessage + "] from ip : [" + socket.getInetAddress().getHostAddress() + "] from [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort()  + "]");
         Message m = new Message(nickname, Calendar.getInstance().getTime(),msg,null);
         setChanged();
         notifyObservers(m);

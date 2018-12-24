@@ -68,6 +68,8 @@ public class FriendViewController extends Observable implements Observer {
         assert friendViewStatus != null : "fx:id=\"friendViewStatus\" was not injected: check your FXML file 'friendView.fxml'.";
         friendViewUname.setText(nickname);
 
+        friendView.getStyleClass().setAll("lbl","lbl-primary");
+
     }
 
     public void setNickname(String nickname){

@@ -176,6 +176,7 @@ public class MainController implements Observer {
 
     private void handleContextMenuClick(String uname){
         //friendListVBox.getChildren().add(new Label(uname));
+        System.out.println("Handle click uname = [" + uname + "]");
         if(connManager.initChat(uname)) {
             initChat(uname);
         }

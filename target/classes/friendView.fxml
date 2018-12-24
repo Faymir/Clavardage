@@ -11,7 +11,7 @@
    <children>
       <ImageView fx:id="friendPicture" fitHeight="42.0" fitWidth="48.0" onMouseClicked="#friendViewClicked" pickOnBounds="true" HBox.hgrow="ALWAYS">
          <image>
-            <Image url="@../../img/blank_avatar.png" />
+            <Image url="@blank_avatar.png" />
          </image>
       </ImageView>
       <Separator onMouseClicked="#friendViewClicked" opacity="0.0" prefHeight="27.0" prefWidth="41.0" HBox.hgrow="ALWAYS" />

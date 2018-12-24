@@ -31,6 +31,32 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.gluonhq/charm-glisten -->
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-down-plugin-display</artifactId>
+            <version>3.8.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-down-plugin-lifecycle</artifactId>
+            <version>3.8.5</version><scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-down-plugin-statusbar</artifactId>
+            <version>3.8.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-down-plugin-storage</artifactId>
+            <version>3.8.5</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <repositories>

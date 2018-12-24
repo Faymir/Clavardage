@@ -40,7 +40,9 @@ public class ConnexionController implements Observer
 
     @FXML
     public void initialize(){
+
         System.out.println("Initialize connexion window");
+        this.modeCheckBox.setSelected(true);
     }
 
     @FXML
@@ -82,6 +84,7 @@ public class ConnexionController implements Observer
             usernameTextEdit.setDisable(false);
             Signal s = (Signal) o;
             if (s.type == Type.BAD_USERNAME) {
+                System.out.println("s = [" + s.type + "]");
                 Platform.runLater(
                         () -> {
                             errorLabel.setStyle("-fx-text-fill: red");
@@ -89,6 +92,7 @@ public class ConnexionController implements Observer
                         }
                 );
             } else if (s.type == Type.GOOD_USERNAME) {
+                System.out.println("s = [" + s.type + "]");
                 String username = usernameTextEdit.getText();
                 Platform.runLater(
                         () -> {
@@ -101,11 +105,12 @@ public class ConnexionController implements Observer
                 connManager.setClientName(username);
                 (new Thread(connManager)).start();
                 Stage stage = (Stage) (usernameTextEdit).getScene().getWindow();
-
-                    Platform.runLater(
+                Platform.runLater(
                             () -> {
                                 try {
-                                    stage.setScene(new Scene(mainWindow.load(),800,600));
+                                    Scene scene = new Scene(mainWindow.load(),800,600);
+                                    scene.getStylesheets().add("org/kordamp/bootstrapfx/bootstrapfx.css");
+                                    stage.setScene(scene);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
