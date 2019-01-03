@@ -109,7 +109,7 @@ public class ConnexionController implements Observer
                             () -> {
                                 try {
                                     Scene scene = new Scene(mainWindow.load(),800,600);
-                                    scene.getStylesheets().add("org/kordamp/bootstrapfx/bootstrapfx.css");
+                                    //scene.getStylesheets().add("org/kordamp/bootstrapfx/bootstrapfx.css");
                                     stage.setScene(scene);
                                 } catch (IOException e) {
                                     e.printStackTrace();

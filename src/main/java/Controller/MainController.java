@@ -256,7 +256,7 @@ public class MainController implements Observer {
             c.addObserver(this);
             friend.addObserver(c);
 
-            FXMLLoader view = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
+            FXMLLoader view = new FXMLLoader(getClass().getResource("../friendView.fxml"));
             view.setController(c);
 
             // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
@@ -264,6 +264,8 @@ public class MainController implements Observer {
                     () -> {
                         // Update UI here.
                         try {
+
+                            System.out.println("dir = [" + System.getProperty("user.dir") + "]");
                             friendListVBox.getChildren().add(view.load());
                         } catch (IOException e) {
                             e.printStackTrace();
