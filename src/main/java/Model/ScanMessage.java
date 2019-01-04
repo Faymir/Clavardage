@@ -10,8 +10,8 @@ public class ScanMessage implements Serializable {
     public enum ScanType implements Serializable{
         DISCOVER("DISCOVERING NETWORK"),
         RETURN_INFORMATION("Return clients information to new user with is version number"),
-        UPDATE_INFORMATION("Return new user information");
-
+        UPDATE_INFORMATION("Return new user information"),
+        DISCONNECT("This user Disconnected");
         private String msg;
 
         private ScanType(String msg){

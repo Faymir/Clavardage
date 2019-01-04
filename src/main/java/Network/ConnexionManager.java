@@ -397,7 +397,16 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 	}
 
 	public void setWork(boolean work) {
-		this.work = work;
+		if(this.networkScanListener != null){
+            ScanMessage msg = new ScanMessage(ScanMessage.ScanType.DISCONNECT,networkScanListener.getVersionNumber(),clientName);
+            msg.uniqueID = uniqueID;
+            try {
+                NetworkScanner.broadcastToAll(SerializationUtils.serialize(msg));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        this.work = work;
 	}
 
 	public UserChatListener getFriend(String username){
@@ -437,6 +446,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
         msg.uniqueID = uniqueID;
         try {
             NetworkScanner.broadcastToAll(SerializationUtils.serialize(msg));
+            System.out.println("\n\nI AM THE NEW RESPONDER OF BROADCAST MESSAGES [" + networkScanListener.getVersionNumber() + "]\n\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -507,7 +517,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 
     public void addIncomingMessageListener(String uname,Observer observer){
 	    UserChatListener l = getFriend(uname);
-	    if(uname != null){
+	    if(l != null){
 	        l.addObserver(observer);
         }
     }
@@ -540,6 +550,13 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
                 printUsers();
                 setChanged();
                 notifyObservers(new Signal(Type.CONNECT, msg.newUsername));
+            }
+            if (msg.type == ScanMessage.ScanType.DISCONNECT){
+                connectedUsers2.remove(msg.newUsername);
+                friendList.removeIf( friend -> friend.nickname.equals(msg.newUsername) );
+                printUsers();
+                setChanged();
+                notifyObservers(new Signal(Type.DISCONNECT, msg.newUsername));
             }
         }
     }

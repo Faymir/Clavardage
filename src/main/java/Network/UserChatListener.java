@@ -54,7 +54,7 @@ public class UserChatListener extends Observable implements Runnable {
                 System.out.println("Closed Socket");
             }
         }
-        System.out.println("Stopped Listening User: [" + nickname + "]");
+        System.out.println("Stopped Listening User: [" + nickname + "] maube connection lost");
     }
 
     private void notifyListeners(String msg){

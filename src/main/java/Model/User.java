@@ -20,6 +20,7 @@ public class User extends Observable implements Observer {
     private int status;
     private Vector<Message> discussion;
     private int lastMessageIndex;
+    private boolean connected = true;
 
     public User(String uname){
         this.nickname = uname;
@@ -83,6 +84,21 @@ public class User extends Observable implements Observer {
         this.nickname = nickname;
     }
 
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    public void setLastMessageIndex(int lastMessageIndex) {
+        this.lastMessageIndex = lastMessageIndex;
+    }
+
+    public int getLastMessageIndex() {
+        return lastMessageIndex;
+    }
 
     public void loadDiscussion(){
 

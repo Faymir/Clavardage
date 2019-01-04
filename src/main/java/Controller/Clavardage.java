@@ -1,5 +1,7 @@
 package Controller;
 
+import Model.Database;
+import Model.Message;
 import Network.ConnexionManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
+import java.util.Vector;
 
 public class Clavardage extends Application {
     private ConnexionManager connexionManager;
@@ -17,6 +20,11 @@ public class Clavardage extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         //Classes Init
+        //Database.createNewDatabase("database.sqlite");
+        Vector<Message> v = (Vector<Message>)Database.getInstance().getbyName("a", "messages");
+
+
+
         connexionManager = new ConnexionManager(ConnexionManager.ManagerMode.BROADCAST);
         primaryStage = stage;
         //UI INIT
@@ -27,7 +35,6 @@ public class Clavardage extends Application {
 
         FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("../connexionWidget.fxml"));
         ConnexionController connexionController = new ConnexionController(connexionManager, root);
-        UsersList usersList = new UsersList();
 
 
         Callback<Class<?>, Object> controllerFactory = type -> {
@@ -61,7 +68,8 @@ public class Clavardage extends Application {
         primaryStage.setTitle("Clavardage");
         primaryStage.setOnCloseRequest(windowEvent -> {
             System.out.println("Close request");
-            connexionManager.setWork(false);
+            mainController.saveData();
+            //connexionManager.setWork(false);
             Platform.exit();
         });
         primaryStage.setScene(connScene);

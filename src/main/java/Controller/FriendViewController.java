@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Effect;
 import javafx.scene.effect.SepiaTone;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -86,6 +87,14 @@ public class FriendViewController extends Observable implements Observer {
         friendView.setEffect(null);
     }
 
+    public void disconnected(){
+        System.out.println(getClass().getResource("../disconnected.png").toString());
+        this.friendViewStatus.setImage(new Image(getClass().getResource("../disconnected.png").toString()));
+    }
+
+    public void connected(){
+        this.friendViewStatus.setImage(new Image(getClass().getResource("../connected.png").toString()));
+    }
     public void select(){
         this.selected = true;
 //        int depth = 70;

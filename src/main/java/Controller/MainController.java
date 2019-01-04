@@ -111,12 +111,14 @@ public class MainController implements Observer {
     }
 
     @FXML
-    void sendClicked(ActionEvent event) {
+    private void sendClicked(ActionEvent event) {
         if(textField.getText().isEmpty())
             return;
         String actualFriendName = getActualFriend();
-        if (actualFriendName == null)
+        if (actualFriendName == null) {
             System.out.println("actualFriend Error = [" + actualFriendName + "]");
+            return;
+        }
         Message m = new Message(connManager.getClientName(), Calendar.getInstance().getTime(), textField.getText(), actualFriendName);
         textField.clear();
         connManager.sendMessage(m);
@@ -216,38 +218,55 @@ public class MainController implements Observer {
                     this.connectedUsersList.getItems().add(s.message);
                 }
         );
+        User u = getFriend(s.message);
+        if(u != null){
+            u.setConnected(true);
+            Objects.requireNonNull(getFriendView(s.message)).connected();
+            if (discussion.getName().equals(s.message)){
+                discussion.addServerMessage(s.message, " s'est reconnecté", true);
+                discussion.setFriend(null, null);
+                discussion.updateResultHtml();
+                Platform.runLater(
+                        () -> { discussionWebview.getEngine().loadContent(discussion.getHtml()); }
+                );
+            }
+            connManager.initChat(s.message);
+            initChat(s.message);
+        }
     }
 
-//    private void handleinitChat(Signal s){
-//        //TODO: not finished not yet working: when received message from server that someone want to chat
-//        Label l = new Label(s.message);
-//        l.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent mouseEvent) {
-//                User u = getFriend(s.message);
-//                if (u == null){
-//                    u = new User(s.message);
-//                }
-//                for (User friend: friends) {
-//                    friend.deleteObservers();
-//                }
-////                u.addObserver(this);
-//            }
-//        });
-////        this.friendListVBox.getChildren().add();
-//    }
+    private void handleDisconnection(Signal s){
+        Platform.runLater(
+            () -> {connectedUsersList.getItems().remove(s.message);}
+        );
+
+        if(discussion.getName().equals(s.message))
+            discussion.addServerMessage(s.message , " viens de se déconnecter", false);
+
+        User u = getFriend(s.message);
+        FriendViewController c = getFriendView(s.message);
+
+        if(u != null)   u.setConnected(false);
+        if(c != null)   c.disconnected();
+
+        Platform.runLater(
+                () -> { discussionWebview.getEngine().loadContent(discussion.getHtml()); }
+        );
+    }
 
     private void initChat(String username){
         //TODO: not finished: must init listeners, observers, and a user
     	Platform.runLater(
-                () -> {
-                    // Update UI here.
+                () -> {// Update UI here.
                     System.out.println("removed from initchat = [" + connectedUsersList.getItems().remove(username) + "]");
                 }
         );
         User friend = getFriend(username);
         if(friend == null){
             friend = new User(username);
+            User tmp = Database.getInstance().getUser(username);
+            if (tmp!= null)
+                friend = tmp;
             friends.add(friend);
             FriendViewController c = new FriendViewController(username);
             friendViews.add(c);
@@ -275,6 +294,7 @@ public class MainController implements Observer {
             connManager.addObserver(friend);
         }else{
             connManager.addIncomingMessageListener(username, friend);
+            connManager.addObserver(friend);
         }
 
 
@@ -297,6 +317,7 @@ public class MainController implements Observer {
                     initChat(s.message);
                     break;
                 case DISCONNECT:
+                    handleDisconnection(s);
                     break;
                 default:
                     break;
@@ -307,16 +328,21 @@ public class MainController implements Observer {
             
             Signal s = (Signal) o;
             if(s.type == Type.SHOW_DISCUSSION){
-                FriendViewController view = null;
                 for (FriendViewController c: friendViews) {
-                    if (c.getNickname() != s.message)
+                    if (!c.getNickname().equals(s.message))
                         c.unselect();
                 }
                 User u = getFriend(s.message);
                 if (u != null) {
+                    int nbr = 0;
 //                    Message m1 = new Message("Test", Calendar.getInstance().getTime(), "Un test", null);
 //                    u.addMessage(m1);
                     discussion = new WebViewData(u.getDiscussion());
+                    discussion.setStatus(u.isConnected());
+                    if(!u.getDiscussion().isEmpty())
+                        nbr = u.getDiscussion().size();
+                    discussion.setFriend(u.getNickname(), nbr + "");
+                    discussion.updateResultHtml();
                 }
                 else {
                     System.out.println("SHIT HAPPENS IN SHOW DISCUSSION  observable = [" + observable + "], s.type = [" + s.type + "] s.message [" + s.message + "]");
@@ -334,6 +360,15 @@ public class MainController implements Observer {
             //TODO: create methods to update view on new message if this user is the current selected and showed on webview
 
             //TODO: afficher une icone représentant le nombre de nouveau messages
+        }
+    }
+
+    public void saveData() {
+        for (int i = 0; i < friends.size(); i++) {
+            if(!Database.getInstance().checkExist(friends.get(i).getNickname()))
+                Database.getInstance().insert(friends.get(i));
+            else
+                Database.getInstance().update(friends.get(i).getNickname(), friends.get(i));
         }
     }
 }

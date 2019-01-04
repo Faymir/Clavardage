@@ -87,6 +87,7 @@ public class ConnexionController implements Observer
                 System.out.println("s = [" + s.type + "]");
                 Platform.runLater(
                         () -> {
+                            progressBar.setProgress(0);
                             errorLabel.setStyle("-fx-text-fill: red");
                             errorLabel.setText("This Username is already taken, choose an other one");
                         }
@@ -108,7 +109,7 @@ public class ConnexionController implements Observer
                 Platform.runLater(
                             () -> {
                                 try {
-                                    Scene scene = new Scene(mainWindow.load(),800,600);
+                                    Scene scene = new Scene(mainWindow.load(),850,600);
                                     //scene.getStylesheets().add("org/kordamp/bootstrapfx/bootstrapfx.css");
                                     stage.setScene(scene);
                                 } catch (IOException e) {

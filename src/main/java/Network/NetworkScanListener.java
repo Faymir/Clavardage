@@ -12,6 +12,7 @@ import java.util.*;
 public class NetworkScanListener extends Observable implements Observer {
     private BroadcastReceiver receiver;
     private HashMap<String, String> connectedUsers;
+    private Vector<Integer> versions;
     private int versionNumber;
     private int lastVersion;
     private String uname;
@@ -25,6 +26,7 @@ public class NetworkScanListener extends Observable implements Observer {
         receiver = new BroadcastReceiver(uniqueID);
         receiver.addObserver(this);
         connectedUsers = new HashMap<>();
+        versions = new Vector<>();
     }
 
     public NetworkScanListener(String username, HashMap<String, String> connectedUsers, String uiid){
@@ -66,8 +68,11 @@ public class NetworkScanListener extends Observable implements Observer {
         switch (msg.type){
             case DISCOVER:
                 if(versionNumber == lastVersion){
-                if(!connectedUsers.containsKey(uname))
-                    connectedUsers.put(uname,receiver.getOwnIp());
+
+
+                    if(!connectedUsers.containsKey(uname))
+                        connectedUsers.put(uname,receiver.getOwnIp());
+
                     Set<Map.Entry<String, String>> setHm = connectedUsers.entrySet();
                     Iterator<Map.Entry<String, String>> it = setHm.iterator();
 
@@ -83,6 +88,7 @@ public class NetworkScanListener extends Observable implements Observer {
                             connectedUsers,
                             lastVersion + 1);
                     message.uniqueID = uniqueID;
+                    System.out.println("\n\nI WAS THE RESPONDER OF BROADCAST MESSAGES [" + lastVersion + "]\n\n");
                     System.out.println("return info " + connectedUsers.size() + " to ip[ " + msg.ip + "]");
                     try {
                         NetworkScanner.broadcast(SerializationUtils.serialize(message), InetAddress.getByName(msg.ip));
@@ -99,7 +105,30 @@ public class NetworkScanListener extends Observable implements Observer {
                 lastVersion = msg.newUserVersion;
 //                HashMap<String, String> second = (HashMap<String, String>) connectedUsers.clone();
 //                second.remove(uname);
-                if(msg.uniqueID != uniqueID) {
+                if(!msg.uniqueID.equals(uniqueID)) {
+                    versions.add(msg.newUserVersion);
+                    setChanged();
+                    notifyObservers(msg);
+                }
+                break;
+            case DISCONNECT:
+                versions.removeIf( a -> a == msg.newUserVersion);
+                boolean responder = false;
+
+                if(versions.size() > 0){
+                    int max = Collections.max(versions);
+                    if (versionNumber > max)
+                        responder = true;
+                }
+                else
+                    responder = true;
+
+                if (responder){
+                    System.out.println("\n\n\n\t\t I SHOULD BE THE NEW RESPONDER \n\n");
+                    this.versionNumber = lastVersion;
+                }
+                connectedUsers.remove(msg.newUsername);
+                if(!msg.uniqueID.equals(uniqueID)) {
                     setChanged();
                     notifyObservers(msg);
                 }
