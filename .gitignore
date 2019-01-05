@@ -10,6 +10,7 @@
 .attach_pid*
 .classpath
 .project
+*.sqlite
 /lib/charm-glisten-4.4.1.jar
 /lib/charm-glisten-4.4.1-javadoc.jar
 test.uml

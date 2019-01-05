@@ -1,5 +1,5 @@
-package Controller;
-
+import Controller.ConnexionController;
+import Controller.MainController;
 import Network.ConnexionManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,7 +11,7 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 
-public class Clavardage extends Application {
+public class App extends Application {
     private ConnexionManager connexionManager;
     private Stage primaryStage;
     @Override
@@ -21,11 +21,11 @@ public class Clavardage extends Application {
         primaryStage = stage;
         //UI INIT
 //        String current = System.getProperty("user.dir") + "/src/Controller/View/";
-        FXMLLoader root = new FXMLLoader(getClass().getResource("../template.fxml"));
+        FXMLLoader root = new FXMLLoader(getClass().getResource("template.fxml"));
         MainController mainController = new MainController(connexionManager);
         root.setController(mainController);
 
-        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("../connexionWidget.fxml"));
+        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("connexionWidget.fxml"));
         ConnexionController connexionController = new ConnexionController(connexionManager, root);
 
 
