@@ -1,7 +1,5 @@
 package Controller;
 
-import Model.Database;
-import Model.Message;
 import Network.ConnexionManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -12,7 +10,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.util.Vector;
 
 public class Clavardage extends Application {
     private ConnexionManager connexionManager;

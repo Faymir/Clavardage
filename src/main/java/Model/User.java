@@ -2,7 +2,6 @@ package Model;
 
 import Network.UserChatListener;
 
-import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;

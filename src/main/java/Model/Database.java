@@ -4,7 +4,6 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.File;
 import java.sql.*;
-import java.util.Vector;
 
 public class Database {
     private static final String defaultDbName = "database.sqlite";
