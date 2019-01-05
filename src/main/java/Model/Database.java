@@ -7,11 +7,16 @@ import java.sql.*;
 import java.util.Vector;
 
 public class Database {
+    private static final String defaultDbName = "database.sqlite";
     private static Database instance = null;
     private static String url = "";
 
     private Database(){
-        setDbName("database.sqlite");
+        File f = new File(System.getProperty("user.dir") + File.separator + defaultDbName);
+        if(!f.exists() || f.isDirectory()) {
+            createNewDatabase();
+        }
+        setDbName(defaultDbName);
     }
 
     private Connection connect() {

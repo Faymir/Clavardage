@@ -20,11 +20,6 @@ public class Clavardage extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         //Classes Init
-        //Database.createNewDatabase("database.sqlite");
-        Vector<Message> v = (Vector<Message>)Database.getInstance().getbyName("a", "messages");
-
-
-
         connexionManager = new ConnexionManager(ConnexionManager.ManagerMode.BROADCAST);
         primaryStage = stage;
         //UI INIT
