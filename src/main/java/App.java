@@ -1,5 +1,6 @@
 import Controller.ConnexionController;
 import Controller.MainController;
+import Model.FxmlGetter;
 import Network.ConnexionManager;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -9,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.File;
 import java.io.IOException;
 
 public class App extends Application {
@@ -20,12 +22,11 @@ public class App extends Application {
         connexionManager = new ConnexionManager(ConnexionManager.ManagerMode.BROADCAST);
         primaryStage = stage;
         //UI INIT
-//        String current = System.getProperty("user.dir") + "/src/Controller/View/";
-        FXMLLoader root = new FXMLLoader(getClass().getResource("template.fxml"));
+        FXMLLoader root = new FXMLLoader(FxmlGetter.get("template.fxml"));
         MainController mainController = new MainController(connexionManager);
         root.setController(mainController);
 
-        FXMLLoader connexionWidget = new FXMLLoader(getClass().getResource("connexionWidget.fxml"));
+        FXMLLoader connexionWidget = new FXMLLoader(FxmlGetter.get("connexionWidget.fxml"));
         ConnexionController connexionController = new ConnexionController(connexionManager, root);
 
 

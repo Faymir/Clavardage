@@ -3,7 +3,6 @@
 /.settings
 /View/
 /target/
-*.iml
 *.class
 *.eml
 *.userlibraries

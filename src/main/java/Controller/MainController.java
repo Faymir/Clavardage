@@ -20,6 +20,7 @@ import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.*;
 
 public class MainController implements Observer {
@@ -80,6 +81,7 @@ public class MainController implements Observer {
         friends = new Vector<>();
         friendViews = new Vector<>();
         discussion = new WebViewData();
+        System.out.println("connexionManager = [" + connexionManager + "]");
     }
 
     @FXML
@@ -271,17 +273,24 @@ public class MainController implements Observer {
             c.addObserver(this);
             friend.addObserver(c);
 
-            FXMLLoader view = new FXMLLoader(getClass().getResource("../friendView.fxml"));
+            FXMLLoader view = null;
+            try {
+                view = new FXMLLoader(FxmlGetter.get("friendView.fxml"));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                System.exit(-1);
+            }
             view.setController(c);
 
             // Avoid throwing IllegalStateException by running from a non-JavaFX thread.
+            FXMLLoader finalView = view;
             Platform.runLater(
                     () -> {
                         // Update UI here.
                         try {
 
                             System.out.println("dir = [" + System.getProperty("user.dir") + "]");
-                            friendListVBox.getChildren().add(view.load());
+                            friendListVBox.getChildren().add(finalView.load());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
