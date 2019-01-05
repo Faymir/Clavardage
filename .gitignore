@@ -6,9 +6,10 @@
 *.iml
 *.class
 *.eml
-*.iml
+*.userlibraries
 .attach_pid*
 .classpath
 .project
 /lib/charm-glisten-4.4.1.jar
 /lib/charm-glisten-4.4.1-javadoc.jar
+test.uml

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<eclipse-userlibraries>
-  <library name="lib">
-    <archive path="/home/faymir/Bureau/INSA/project/POO/Clavardage/lib/charm-glisten-4.4.1.jar" />
-    <archive path="/home/faymir/Bureau/INSA/project/POO/Clavardage/lib/charm-glisten-4.4.1-javadoc.jar" />
-  </library>
-</eclipse-userlibraries>
-
