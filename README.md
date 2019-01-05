@@ -1,6 +1,6 @@
 # Clavardage
 
-A distributted Chatting app based on sockets made with Java and JavaFX UI.
+A distributed Chatting app based on sockets. It is made with Java and using JavaFX UI as GUI.
 
 ## Have tree modes:
 
