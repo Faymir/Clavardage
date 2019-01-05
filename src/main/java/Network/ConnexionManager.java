@@ -69,7 +69,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
     private HashMap<String, String> connectedUsers2;
 
 	private static final int portStart = 10000;
-	private static final int portEnd = 11000;
+	private static final int portEnd = 10005;
 	private int server_port = 0;
     private ManagerMode mode = ManagerMode.TEST;
     private NetworkScanner networkScanner;
@@ -289,6 +289,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 	public void scanUsers(){
         System.out.println("\t\tScan Users");
         if (mode == ManagerMode.TEST) {
+            long a = System.currentTimeMillis();
             for (int i = portStart; i < portEnd; i++) {
                 if (i != server_port && !connectedUsers.containsValue(i)) {
                     try {
@@ -310,12 +311,13 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
                     } catch (SocketTimeoutException e) {
                         System.out.println("timeout");
                     } catch (ConnectException e) {
-//                    System.out.println("not opened");//e.printStackTrace();
+                    System.out.println("not opened");//e.printStackTrace();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }
+            System.out.println("time = " + (System.currentTimeMillis() - a));
             printUsers();
             System.out.println("\t\tEnd Scan");
         }

@@ -45,6 +45,8 @@ public class UserChatListener extends Observable implements Runnable {
             } 
             catch(SocketException e) {
                 System.out.println("Connexion fermée pendant l'écoute");
+                connected = false;
+                working = false;
             }
             catch (IOException e) {
                 e.printStackTrace();

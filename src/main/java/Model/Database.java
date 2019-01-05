@@ -11,11 +11,12 @@ public class Database {
     private static String url = "";
 
     private Database(){
+        setDbName(defaultDbName);
         File f = new File(System.getProperty("user.dir") + File.separator + defaultDbName);
         if(!f.exists() || f.isDirectory()) {
             createNewDatabase();
+            createFriendsTable();
         }
-        setDbName(defaultDbName);
     }
 
     private Connection connect() {
@@ -44,7 +45,7 @@ public class Database {
             }
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -63,8 +64,9 @@ public class Database {
              Statement stmt = conn.createStatement()) {
             // create a new table
             stmt.execute(sql);
+            System.out.println("Table friend created");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
