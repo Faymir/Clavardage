@@ -275,7 +275,7 @@ public class MainController implements Observer {
 
             FXMLLoader view = null;
             try {
-                view = new FXMLLoader(FxmlGetter.get("friendView.fxml"));
+                view = new FXMLLoader(FileLoader.getInstance().get("friendView.fxml"));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
                 System.exit(-1);
