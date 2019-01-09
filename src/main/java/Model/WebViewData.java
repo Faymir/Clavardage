@@ -45,7 +45,7 @@ public class WebViewData {
             System.out.println("\n\nRessources = "+ getClass().getResource("../head.html").getPath() + "\n\n");*/
             vanillaHead = new String(Files.readAllBytes(Paths.get(/*current +*/ FileLoader.getInstance().getPath("head.html"))));
             head = vanillaHead + "<div class=\"card-body msg_card_body\">";
-            tail = new String(Files.readAllBytes(Paths.get(/*current +*/FileLoader.getInstance().getPath("tail.txt"))));
+            tail = new String(Files.readAllBytes(Paths.get(/*current +*/FileLoader.getInstance().getPath("tail.html"))));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Fichier head.html ou tail non trouvé");
