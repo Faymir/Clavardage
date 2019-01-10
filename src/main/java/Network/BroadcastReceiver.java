@@ -65,7 +65,9 @@ public class BroadcastReceiver extends Observable implements Runnable {
                         socket.close();
                         socket = null;
                     }
+                    System.out.println("ip before " + msg.ip);
                     msg.ip = packet.getAddress().getHostAddress();
+                    System.out.println("ip after " + msg.ip);
                     setChanged();
                     notifyObservers(msg);
                 }

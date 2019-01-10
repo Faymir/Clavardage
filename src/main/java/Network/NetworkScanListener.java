@@ -65,6 +65,7 @@ public class NetworkScanListener extends Observable implements Observer {
     }
 
     public void handleScanMsg(ScanMessage msg){
+        System.out.println("msg ip = [" + msg.ip + "]");
         switch (msg.type){
             case DISCOVER:
                 if(versionNumber == lastVersion){
