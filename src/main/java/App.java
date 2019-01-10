@@ -2,6 +2,7 @@ import Controller.ConnexionController;
 import Controller.MainController;
 import Model.FileLoader;
 import Network.ConnexionManager;
+import Network.GetNetworkAddress;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.IOException;
+import java.net.NetworkInterface;
 
 public class App extends Application {
     private ConnexionManager connexionManager;
@@ -84,6 +86,8 @@ public class App extends Application {
         // Save file
     }
     public static void main(String[] args) {
-        launch(args);
+        //launch(args);
+
+        System.out.println("Mac = [" + GetNetworkAddress.GetAddress("mac") + "]");;
     }
 }
