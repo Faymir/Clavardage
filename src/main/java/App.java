@@ -86,8 +86,8 @@ public class App extends Application {
         // Save file
     }
     public static void main(String[] args) {
-        //launch(args);
+        launch(args);
 
-        System.out.println("Mac = [" + GetNetworkAddress.GetAddress("mac") + "]");;
+        //System.out.println("Mac = [" + GetNetworkAddress.GetAddress("mac") + "]");;
     }
 }
