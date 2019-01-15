@@ -8,11 +8,13 @@ import Network.ConnexionManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -92,20 +94,6 @@ public class MainController implements Observer {
         discussionWebview.getEngine().loadContent(discussion.getHtml());
         usernameLabel.setText(connManager.getClientName());
         this.connectedUsersList.getItems().addAll(connManager.getConnectedUsersName());
-//
-//        FXMLLoader friend = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
-//        FriendViewController c = new FriendViewController("Faymir");
-//        friend.setController(c);
-//
-//        try {
-//            this.friendListVBox.getChildren().add(friend.load());
-//            friend = new FXMLLoader(getClass().getResource("View/friendView.fxml"));
-//            c = new FriendViewController("ffbv");
-//            friend.setController(c);
-//            this.friendListVBox.getChildren().add(friend.load());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @FXML
@@ -122,7 +110,7 @@ public class MainController implements Observer {
         connManager.sendMessage(m);
         discussion.addMessage(m,true);
         discussionWebview.getEngine().loadContent(discussion.getHtml());
-        //discussionWebview.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
+        discussionWebview.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
 
     @FXML
@@ -143,13 +131,19 @@ public class MainController implements Observer {
         connectedUsersList.setCellFactory(lv -> {
 
             ListCell<String> cell = new ListCell<>();
+            cell.setOnMouseClicked(event -> {
+                    if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
+                        System.out.println("Double clicked");
+                        handleContextMenuClick(cell.getText());
+                    }
+                });
 
-            ContextMenu contextMenu = new ContextMenu();
-
-
+                ContextMenu contextMenu = new ContextMenu();
             MenuItem editItem = new MenuItem();
             editItem.textProperty().bind(Bindings.format("Démarrer une discussion"));
+//            editItem.set
             editItem.setOnAction(event -> {
+                System.out.println("event " + event);
                 String username = cell.getItem();
                 handleContextMenuClick(username);
             });

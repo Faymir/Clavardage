@@ -88,6 +88,7 @@ public class NetworkScanListener extends Observable implements Observer {
                             ScanMessage.ScanType.RETURN_INFORMATION,
                             connectedUsers,
                             lastVersion + 1);
+                    message.newUsername = uname;
                     message.uniqueID = uniqueID;
                     System.out.println("\n\nI WAS THE RESPONDER OF BROADCAST MESSAGES [" + lastVersion + "]\n\n");
                     System.out.println("return info " + connectedUsers.size() + " to ip[ " + msg.ip + "]");
