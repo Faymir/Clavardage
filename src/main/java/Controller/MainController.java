@@ -21,9 +21,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
+
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.apache.commons.codec.binary.Base64;
 
 public class MainController implements Observer {
 
@@ -76,13 +83,25 @@ public class MainController implements Observer {
     private WebViewData discussion;
     private Vector<User> friends;
     private Vector<FriendViewController> friendViews;
+    private Stage stage;
 
-    public MainController(ConnexionManager connexionManager){
+    //"http://webresizer.com/images2/bird1_after.jpg"
+    public MainController(ConnexionManager connexionManager, Stage stage){
         this.connManager = connexionManager;
+        this.stage = stage;
         connexionManager.addObserver(this);
         friends = new Vector<>();
         friendViews = new Vector<>();
         discussion = new WebViewData();
+        String img = "";
+        try {
+            img = Base64.encodeBase64String(Files.readAllBytes(FileLoader.getInstance().getPathObject("bird.jpg")));
+            System.out.println("connexionManager = [" + img + "]");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Message m = new Message("friend", Calendar.getInstance().getTime(), "<img src=\"data:image/png;base64, " + img + "\"/>", null);
+        discussion.addMessage(m, false);
         System.out.println("connexionManager = [" + connexionManager + "]");
     }
 
@@ -110,7 +129,6 @@ public class MainController implements Observer {
         connManager.sendMessage(m);
         discussion.addMessage(m,true);
         discussionWebview.getEngine().loadContent(discussion.getHtml());
-        discussionWebview.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
 
     @FXML
@@ -125,6 +143,36 @@ public class MainController implements Observer {
     	{
     		sendClicked(null);
     	}
+    }
+
+
+
+    @FXML
+    void newFileClicked(ActionEvent event){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Folder");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File path = fileChooser.showOpenDialog(stage);
+        System.out.println(path);
+        if(path == null) {
+            return;
+        }
+        sendImage(getHtmlImageFormat(path.toPath()));
+    }
+
+    @FXML
+    void sendUrlFile(ActionEvent event){
+        TextInputDialog dialog = new TextInputDialog("FileUrl");
+        dialog.setTitle("Image File");
+        dialog.setHeaderText("You can find you image url by googling it and paste it here");
+        dialog.setContentText("Please enter file url (https://...):");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(url -> {
+            sendImage(urltoImgTag(url));
+        });
     }
 
     private void initContextMenu(){
@@ -219,7 +267,9 @@ public class MainController implements Observer {
                 discussion.setFriend(null, null);
                 discussion.updateResultHtml();
                 Platform.runLater(
-                        () -> { discussionWebview.getEngine().loadContent(discussion.getHtml()); }
+                        () -> {
+                            discussionWebview.getEngine().loadContent(discussion.getHtml());
+                        }
                 );
             }
             connManager.initChat(s.message);
@@ -369,5 +419,33 @@ public class MainController implements Observer {
             else
                 Database.getInstance().update(friends.get(i).getNickname(), friends.get(i));
         }
+    }
+    //return an html image formatted <img src="..." >
+    public String getHtmlImageFormat(Path filePath){
+        String img = "";
+        try {
+            img = Base64.encodeBase64String(Files.readAllBytes(filePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String style = "height:400px;max-width:500px;width: expression(this.width > 500 ? 500: true); position: relative; margin: auto 0px;";
+        return "<img style=\"" + style + "\" src=\"data:image/png;base64, " + img + "\"/>";
+    }
+
+    private String urltoImgTag(String url){
+        String style = "height:400px;max-width:500px;width: expression(this.width > 500 ? 500: true); position: relative; margin: auto 0px;";
+        return "<img style=\"" + style + "\" src=\"" + url + "\"/>";
+    }
+
+    private void sendImage(String str){
+        String actualFriendName = getActualFriend();
+        if (actualFriendName == null) {
+            System.out.println("actualFriend Error = [" + actualFriendName + "]");
+            return;
+        }
+        Message m = new Message(null, Calendar.getInstance().getTime(),str, actualFriendName);
+        connManager.sendMessage(m);
+        discussion.addMessage(m, true);
+        discussionWebview.getEngine().loadContent(discussion.getHtml());
     }
 }

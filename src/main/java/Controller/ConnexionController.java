@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class ConnexionController implements Observer
 
     private ConnexionManager connManager;
     private FXMLLoader mainWindow;
+
     @FXML
     private ProgressBar progressBar;
 
