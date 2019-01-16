@@ -1,19 +1,20 @@
 package Network;
 
-import Model.Message;
-import Model.ScanMessage;
-import Model.Signal;
-import Model.Type;
+import Model.*;
+import Security.Cryptography;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -153,6 +154,8 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 			try {
 //                System.out.println("getPort() = [" + u.getSocket().getPort() + "], getLocalPort = [" + u.getSocket().getLocalPort() + "]");
 				sortieVersClient = new PrintWriter(u.getSocket().getOutputStream());
+                Cryptography crypt = new Cryptography(Database.getPrivateKey(), Database.getPublicKey());
+                System.out.println("encrypted msg = [" + crypt.encryptToString(m.getMessage()) + "]");
 				sortieVersClient.println(m.getMessage());
 				sortieVersClient.flush();
 				System.out.println("Sended!!!");

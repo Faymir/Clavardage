@@ -5,6 +5,7 @@ package Controller;
 
 import Model.*;
 import Network.ConnexionManager;
+import Security.Cryptography;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -414,7 +415,7 @@ public class MainController implements Observer {
 
     public void saveData() {
         for (int i = 0; i < friends.size(); i++) {
-            if(!Database.getInstance().checkExist(friends.get(i).getNickname()))
+            if(!Database.getInstance().checkExist(friends.get(i).getNickname(), "friends"))
                 Database.getInstance().insert(friends.get(i));
             else
                 Database.getInstance().update(friends.get(i).getNickname(), friends.get(i));

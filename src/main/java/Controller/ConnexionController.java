@@ -1,5 +1,6 @@
 package Controller;
 
+import Model.Database;
 import Model.Signal;
 import Model.Type;
 import Network.ConnexionManager;
@@ -90,18 +91,19 @@ public class ConnexionController implements Observer
                 Platform.runLater(
                         () -> {
                             progressBar.setProgress(0);
-                            errorLabel.setStyle("-fx-text-fill: red");
+                            errorLabel.setStyle("-fx-text-fill: black; -fx-background-color: red;");
                             errorLabel.setText("This Username is already taken, choose an other one");
                         }
                 );
             } else if (s.type == Type.GOOD_USERNAME) {
                 System.out.println("s = [" + s.type + "]");
                 String username = usernameTextEdit.getText();
+                Database.getInstance().initUser(username);
                 Platform.runLater(
                         () -> {
                             // Update UI here.
                             progressBar.setProgress(0);
-                            errorLabel.setStyle("-fx-text-fill: green");
+                            errorLabel.setStyle("-fx-text-fill: black; -fx-background-color: #4cd137");
                             errorLabel.setText("Username is valid");
                         }
                 );

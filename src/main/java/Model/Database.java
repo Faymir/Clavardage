@@ -1,14 +1,23 @@
 package Model;
 
+import Security.Rsa;
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.File;
 import java.sql.*;
+import java.util.Observable;
+import java.util.Observer;
 
-public class Database {
+public class Database implements Observer {
+    public static final String FIRSTIME = "firstTime";
+    public static final String NEWUSER = "newUser";
     private static final String defaultDbName = "database.sqlite";
     private static Database instance = null;
     private static String url = "";
+    private static Rsa rsa = null;
+    private static String uname = "";
+    private static String privateKey = "";
+    private static String publicKey = "";
 
     private Database(){
         setDbName(defaultDbName);
@@ -16,6 +25,7 @@ public class Database {
         if(!f.exists() || f.isDirectory()) {
             createNewDatabase();
             createFriendsTable();
+            createUserTable();
         }
     }
 
@@ -59,12 +69,70 @@ public class Database {
                 + "	messages BLOB,\n"
                 + " last_message_index int not null default 0\n"
                 + ");";
+        executeQuery(sql);
+    }
 
+    public static void createUserTable(){
+        String sql =
+                "CREATE TABLE IF NOT EXISTS user (\n"
+                        + "	name VARCHAR(50) PRIMARY KEY,\n"
+                        + "	privateKey TEXT NOT NULL,\n"
+                        + "	publicKey TEXT NOT NULL\n"
+                        + ");";
+        executeQuery(sql);
+    }
+
+    private void seedUserTable(){
+        String sql = "INSERT INTO user(name, privateKey, publicKey) VALUES(?,?,?)";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, uname);
+            pstmt.setString(2, rsa.getPrivateKey());
+            pstmt.setString(3, rsa.getPublicKey());
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void selectKeys(){
+        String sql = "SELECT privateKey, publicKey FROM user where name = ?";
+
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setString(1, uname);
+            ResultSet rs    = pstmt.executeQuery();
+            // loop through the result set
+            while (rs.next()) {
+                privateKey = rs.getString("privateKey");
+                publicKey = rs.getString("publicKey");
+
+                System.out.println("publicKey = [" + publicKey + "]\n privateKey = [" + privateKey + "]");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void initUser(String username){
+        uname = username;
+        if(!checkExist(username, "user")){
+            rsa = new Rsa(NEWUSER);
+            rsa.addObserver(this);
+            new Thread(rsa).start();
+        }
+        else
+            selectKeys();
+    }
+
+    private static void executeQuery(String sql){
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
             // create a new table
             stmt.execute(sql);
-            System.out.println("Table friend created");
+            System.out.println("Query ok");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -152,15 +220,15 @@ public class Database {
         return result;
     }
 
-    public boolean checkExist(String friendName){
-        String sql = "SELECT ROWID from friends where name = ?";
+    public boolean checkExist(String name, String table){
+        String sql = "SELECT ROWID from " + table + " where name = ?";
 
         Object result = null;
         try (Connection conn = this.connect();
              PreparedStatement pstmt  = conn.prepareStatement(sql)){
 
             // set the value
-            pstmt.setString(1,friendName);
+            pstmt.setString(1,name);
             //
             ResultSet rs  = pstmt.executeQuery();
             if (rs.next())
@@ -207,6 +275,27 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
+        }
+    }
+
+    public static String getPrivateKey() {
+        return privateKey;
+    }
+
+    public static String getPublicKey() {
+        return publicKey;
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(observable.getClass() == Rsa.class){
+            String type =  (String) o;
+            if(type.equals(NEWUSER)){
+                seedUserTable();
+            }
+
+            selectKeys();
+
         }
     }
 }

@@ -86,6 +86,11 @@ public class BroadcastReceiver extends Observable implements Runnable {
                     System.out.println("Scanner datagram socket timeout");
             }  catch (IOException e) {
                 e.printStackTrace();
+                if(isForScanner){
+                    this.stop();
+                    socket.close();
+                    socket = null;
+                }
             }
         }
         if (socket != null)
