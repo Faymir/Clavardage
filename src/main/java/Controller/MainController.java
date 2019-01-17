@@ -174,11 +174,11 @@ public class MainController implements Observer {
         });
     }
 
-    @FXML
-    void exitApplication(ActionEvent event){
-        saveData();
-        Platform.exit();
-    }
+//    @FXML
+//    void exitApplication(ActionEvent event){
+//        saveData();
+//        Platform.exit();
+//    }
     private void initContextMenu(){
         connectedUsersList.setCellFactory(lv -> {
 
