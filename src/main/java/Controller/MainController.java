@@ -97,13 +97,11 @@ public class MainController implements Observer {
         String img = "";
         try {
             img = Base64.encodeBase64String(Files.readAllBytes(FileLoader.getInstance().getPathObject("bird.jpg")));
-            System.out.println("connexionManager = [" + img + "]");
         } catch (IOException e) {
             e.printStackTrace();
         }
         Message m = new Message("friend", Calendar.getInstance().getTime(), "<img src=\"data:image/png;base64, " + img + "\"/>", null);
         discussion.addMessage(m, false);
-        System.out.println("connexionManager = [" + connexionManager + "]");
     }
 
     @FXML
@@ -176,13 +174,17 @@ public class MainController implements Observer {
         });
     }
 
+    @FXML
+    void exitApplication(ActionEvent event){
+        saveData();
+        Platform.exit();
+    }
     private void initContextMenu(){
         connectedUsersList.setCellFactory(lv -> {
 
             ListCell<String> cell = new ListCell<>();
             cell.setOnMouseClicked(event -> {
                     if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
-                        System.out.println("Double clicked");
                         handleContextMenuClick(cell.getText());
                     }
                 });
@@ -218,7 +220,6 @@ public class MainController implements Observer {
     }
 
     private void handleContextMenuClick(String uname){
-        System.out.println("Handle click uname = [" + uname + "]");
         if(connManager.initChat(uname)) {
             initChat(uname);
         }
@@ -338,6 +339,7 @@ public class MainController implements Observer {
             connManager.addIncomingMessageListener(username, friend);
             connManager.addObserver(friend);
         }
+        SoundPlayer.getInstance().play(SoundPlayer.BELL);
     }
 
     @Override
@@ -386,6 +388,7 @@ public class MainController implements Observer {
                         () -> {
                             // Update UI here.
                                 discussionWebview.getEngine().loadContent(discussion.getHtml());
+                                u.resetLastMessageIndex();
                         }
                 );
             }
@@ -394,7 +397,7 @@ public class MainController implements Observer {
             //TODO: create methods to update view on new message if this user is the current selected and showed on webview
             Signal s = (Signal) o;
             if(s.type == Type.NEW_MESSAGE){
-                SoundPlayer.getInstance().play();
+                SoundPlayer.getInstance().play(SoundPlayer.MESSAGE_TONE);
             }
             //TODO: afficher une icone représentant le nombre de nouveau messages
         }

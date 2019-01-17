@@ -35,7 +35,6 @@ public class App extends Application {
         connexionManager = new ConnexionManager(ConnexionManager.ManagerMode.BROADCAST);
         primaryStage = stage;
         //UI INIT
-        System.out.println("stage = [" + FileLoader.getInstance().get("template.fxml") + "]");
         FXMLLoader root = new FXMLLoader(FileLoader.getInstance().get("template.fxml"));
         MainController mainController = new MainController(connexionManager, stage);
         root.setController(mainController);

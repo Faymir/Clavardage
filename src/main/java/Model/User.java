@@ -39,7 +39,7 @@ public class User extends Observable implements Observer {
         if (observable.getClass() == UserChatListener.class) {
             this.discussion.add((Message) o);
             setChanged();
-            notifyObservers(new Signal(Type.NEW_MESSAGE, lastMessageIndex));
+            notifyObservers(new Signal(Type.NEW_MESSAGE, getNewMessageNumber()));
         }
     }
 
@@ -58,7 +58,10 @@ public class User extends Observable implements Observer {
     }
 
     public int getNewMessageNumber(){
-        return discussion.size() - lastMessageIndex;
+        if(discussion.size() > 1)
+            return discussion.size() - lastMessageIndex - 1;
+        else
+            return 1;
     }
 
 
@@ -97,6 +100,10 @@ public class User extends Observable implements Observer {
 
     public int getLastMessageIndex() {
         return lastMessageIndex;
+    }
+
+    public void resetLastMessageIndex(){
+        this.lastMessageIndex = discussion.size() - 1;
     }
 
     public void loadDiscussion(){

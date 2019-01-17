@@ -108,8 +108,6 @@ public class Database implements Observer {
             while (rs.next()) {
                 privateKey = rs.getString("privateKey");
                 publicKey = rs.getString("publicKey");
-
-                System.out.println("publicKey = [" + publicKey + "]\n privateKey = [" + privateKey + "]");
             }
         } catch (SQLException e) {
             e.printStackTrace();

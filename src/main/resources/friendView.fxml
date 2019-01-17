@@ -6,8 +6,9 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<HBox fx:id="friendView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#friendViewClicked" prefHeight="45.0" prefWidth="205.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"  HBox.hgrow="ALWAYS">
+<HBox fx:id="friendView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#friendViewClicked" prefHeight="45.0" prefWidth="201.0" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ImageView fx:id="friendPicture" fitHeight="42.0" fitWidth="48.0" onMouseClicked="#friendViewClicked" pickOnBounds="true" HBox.hgrow="ALWAYS">
          <image>
@@ -25,6 +26,12 @@
             <Insets top="10.0" />
          </HBox.margin>
       </ImageView>
+      <VBox prefHeight="45.0" prefWidth="18.0">
+         <children>
+            <Separator disable="true" opacity="0.0" orientation="VERTICAL" prefHeight="200.0" />
+            <Label fx:id="newMessageLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="10.0" prefWidth="18.0" style="-fx-background-radius: 15px 15px;" textAlignment="CENTER" textFill="WHITE" />
+         </children>
+      </VBox>
    </children>
    <opaqueInsets>
       <Insets top="5.0" />

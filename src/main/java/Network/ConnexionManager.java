@@ -535,7 +535,6 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
             ScanMessage msg = (ScanMessage) o;
 
             if(msg.uniqueID.equals(this.uniqueID) || !msg.clients.containsKey(tmpClientName)) {
-                System.out.println("username ok");
                 this.connectedUsers2 = (HashMap<String, String>) msg.clients.clone();
                 if(msg.newUsername!=null && !this.tmpClientName.equals(msg.newUsername))
                     this.connectedUsers2.put(msg.newUsername, msg.ip);

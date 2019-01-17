@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import Model.Signal;
 import Model.SoundPlayer;
 import Model.Type;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.effect.SepiaTone;
@@ -43,6 +44,9 @@ public class FriendViewController extends Observable implements Observer {
 
     @FXML
     private ImageView friendPicture;
+
+    @FXML
+    private Label newMessageLabel;
 
     @FXML
     void friendViewClicked(MouseEvent event) {
@@ -95,17 +99,10 @@ public class FriendViewController extends Observable implements Observer {
     }
     public void select(){
         this.selected = true;
-//        int depth = 70;
-//        DropShadow borderGlow= new DropShadow();
-//        borderGlow.setOffsetY(0f);
-//        borderGlow.setOffsetX(0f);
-//        borderGlow.setColor(Color.RED);
-//        borderGlow.setWidth(depth);
-//        borderGlow.setHeight(depth);
-//        friendView.setEffect(borderGlow);
         friendView.setEffect(new SepiaTone());
         friendView.setStyle("-fx-border-color: blue");
-        //friendView.setStyle("-fx-fill: lightblue");
+        newMessageLabel.setStyle("-fx-background-color: inherit");
+        newMessageLabel.setText("");
     }
 
     public boolean isSelected() {
@@ -115,10 +112,19 @@ public class FriendViewController extends Observable implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         //TODO afficher le nombre de nouveaux messages
+        Signal s = (Signal) o;
+
         if(this.selected){
             setChanged();
             notifyObservers(new Signal(Type.SHOW_DISCUSSION,nickname));
-
         }
+        else if(s.type == Type.NEW_MESSAGE){
+            Platform.runLater(() ->
+            {
+                newMessageLabel.setStyle("-fx-background-color: red; -fx-background-radius: 15px 15px");
+                newMessageLabel.setText(s.intValue + "");
+            });
+        }
+
     }
 }
