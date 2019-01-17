@@ -15,7 +15,7 @@ public class Rsa extends Observable implements Runnable {
     protected BigInteger U;
     protected boolean keysGenerated = false;
     private String type = Database.FIRSTIME;
-    private int bitLength = 16;
+    private int bitLength = 2048;
     private Random r = new Random();
 
     public Rsa(BigInteger P, BigInteger Q) {

@@ -176,10 +176,6 @@ public class Database implements Observer {
                 byte[] data = rs.getBytes("messages");
                 u.setDiscussion(SerializationUtils.deserialize(data));
                 u.setLastMessageIndex(rs.getInt("last_message_index"));
-                System.out.println(rs.getString("name") +  "\t" +
-                        rs.getString("ip") + "\t" +
-                        rs.getInt("last_message_index") + "\t" +
-                        data.toString());
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());

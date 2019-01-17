@@ -6,6 +6,7 @@ import java.util.Observer;
 import java.util.ResourceBundle;
 
 import Model.Signal;
+import Model.SoundPlayer;
 import Model.Type;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -117,6 +118,7 @@ public class FriendViewController extends Observable implements Observer {
         if(this.selected){
             setChanged();
             notifyObservers(new Signal(Type.SHOW_DISCUSSION,nickname));
+
         }
     }
 }

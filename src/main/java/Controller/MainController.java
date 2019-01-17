@@ -218,7 +218,6 @@ public class MainController implements Observer {
     }
 
     private void handleContextMenuClick(String uname){
-        //friendListVBox.getChildren().add(new Label(uname));
         System.out.println("Handle click uname = [" + uname + "]");
         if(connManager.initChat(uname)) {
             initChat(uname);
@@ -298,12 +297,6 @@ public class MainController implements Observer {
     }
 
     private void initChat(String username){
-        //TODO: not finished: must init listeners, observers, and a user
-    	Platform.runLater(
-                () -> {// Update UI here.
-                    System.out.println("removed from initchat = [" + connectedUsersList.getItems().remove(username) + "]");
-                }
-        );
         User friend = getFriend(username);
         if(friend == null){
             friend = new User(username);
@@ -317,6 +310,7 @@ public class MainController implements Observer {
             connManager.addIncomingMessageListener(username,friend);
             c.addObserver(this);
             friend.addObserver(c);
+            friend.addObserver(this);
 
             FXMLLoader view = null;
             try {
@@ -333,8 +327,6 @@ public class MainController implements Observer {
                     () -> {
                         // Update UI here.
                         try {
-
-                            System.out.println("dir = [" + System.getProperty("user.dir") + "]");
                             friendListVBox.getChildren().add(finalView.load());
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -346,12 +338,6 @@ public class MainController implements Observer {
             connManager.addIncomingMessageListener(username, friend);
             connManager.addObserver(friend);
         }
-
-
-//        friendListVBox.getChildren().
-        //TODO: Create listof FriendView , push new initCHat to it if not exist
-        // TODO: create related user if not exist
-
     }
 
     @Override
@@ -385,8 +371,6 @@ public class MainController implements Observer {
                 User u = getFriend(s.message);
                 if (u != null) {
                     int nbr = 0;
-//                    Message m1 = new Message("Test", Calendar.getInstance().getTime(), "Un test", null);
-//                    u.addMessage(m1);
                     discussion = new WebViewData(u.getDiscussion());
                     discussion.setStatus(u.isConnected());
                     if(!u.getDiscussion().isEmpty())
@@ -408,7 +392,10 @@ public class MainController implements Observer {
         }
         else if(observable.getClass() == User.class){
             //TODO: create methods to update view on new message if this user is the current selected and showed on webview
-
+            Signal s = (Signal) o;
+            if(s.type == Type.NEW_MESSAGE){
+                SoundPlayer.getInstance().play();
+            }
             //TODO: afficher une icone représentant le nombre de nouveau messages
         }
     }
