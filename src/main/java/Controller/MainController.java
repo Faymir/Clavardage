@@ -4,7 +4,10 @@ package Controller;
  */
 
 import Model.*;
+import Network.BroadcastConnexionManager;
 import Network.ConnexionManager;
+import Network.LocalConnexionManager;
+import Network.SharedObjects;
 import Security.Cryptography;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -80,17 +83,14 @@ public class MainController implements Observer {
     @FXML // fx:id="rightStatus"
     private Label rightStatus; // Value injected by FXMLLoader
 
-    private ConnexionManager connManager;
     private WebViewData discussion;
     private Vector<User> friends;
     private Vector<FriendViewController> friendViews;
     private Stage stage;
 
     //"http://webresizer.com/images2/bird1_after.jpg"
-    public MainController(ConnexionManager connexionManager, Stage stage){
-        this.connManager = connexionManager;
+    public MainController(Stage stage){
         this.stage = stage;
-        connexionManager.addObserver(this);
         friends = new Vector<>();
         friendViews = new Vector<>();
         discussion = new WebViewData();
@@ -107,11 +107,12 @@ public class MainController implements Observer {
     @FXML
     void initialize(){
 
+        SharedObjects.get().connManager.addObserver(this);
         initContextMenu();
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
-        usernameLabel.setText(connManager.getClientName());
-        this.connectedUsersList.getItems().addAll(connManager.getConnectedUsersName());
+        usernameLabel.setText(SharedObjects.get().connManager.getClientName());
+        this.connectedUsersList.getItems().addAll(SharedObjects.get().connManager.getConnectedUsersName());
     }
 
     @FXML
@@ -123,9 +124,9 @@ public class MainController implements Observer {
             System.out.println("actualFriend Error = [" + actualFriendName + "]");
             return;
         }
-        Message m = new Message(connManager.getClientName(), Calendar.getInstance().getTime(), textField.getText(), actualFriendName);
+        Message m = new Message(SharedObjects.get().connManager.getClientName(), Calendar.getInstance().getTime(), textField.getText(), actualFriendName);
         textField.clear();
-        connManager.sendMessage(m);
+        SharedObjects.get().connManager.sendMessage(m);
         discussion.addMessage(m,true);
         discussionWebview.getEngine().loadContent(discussion.getHtml());
     }
@@ -220,7 +221,7 @@ public class MainController implements Observer {
     }
 
     private void handleContextMenuClick(String uname){
-        if(connManager.initChat(uname)) {
+        if(SharedObjects.get().connManager.initChat(uname)) {
             initChat(uname);
         }
     }
@@ -273,7 +274,7 @@ public class MainController implements Observer {
                         }
                 );
             }
-            connManager.initChat(s.message);
+            SharedObjects.get().connManager.initChat(s.message);
             initChat(s.message);
         }
     }
@@ -308,7 +309,7 @@ public class MainController implements Observer {
             FriendViewController c = new FriendViewController(username);
             friendViews.add(c);
 
-            connManager.addIncomingMessageListener(username,friend);
+            SharedObjects.get().connManager.addIncomingMessageListener(username,friend);
             c.addObserver(this);
             friend.addObserver(c);
             friend.addObserver(this);
@@ -334,17 +335,17 @@ public class MainController implements Observer {
                         }
                     }
             );
-            connManager.addObserver(friend);
+            SharedObjects.get().connManager.addObserver(friend);
         }else{
-            connManager.addIncomingMessageListener(username, friend);
-            connManager.addObserver(friend);
+            SharedObjects.get().connManager.addIncomingMessageListener(username, friend);
+            SharedObjects.get().connManager.addObserver(friend);
         }
         SoundPlayer.getInstance().play(SoundPlayer.BELL);
     }
 
     @Override
     public void update(Observable observable, Object o) {
-        if (observable.getClass() == ConnexionManager.class){
+        if (observable.getClass() == BroadcastConnexionManager.class || observable.getClass() == LocalConnexionManager.class){
             Signal s = (Signal) o;
 
             switch (s.type){
@@ -435,7 +436,7 @@ public class MainController implements Observer {
             return;
         }
         Message m = new Message(null, Calendar.getInstance().getTime(),str, actualFriendName);
-        connManager.sendMessage(m);
+        SharedObjects.get().connManager.sendMessage(m);
         discussion.addMessage(m, true);
         discussionWebview.getEngine().loadContent(discussion.getHtml());
     }

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>App</OriginalElement>
+  <nodes>
+    <node x="326.87440476190477" y="848.0">App</node>
+    <node x="577.5023809523809" y="262.5">Controller.FriendViewController</node>
+    <node x="211.09226190476187" y="0.0">Network.ConnexionManager.ManagerMode</node>
+    <node x="10.5" y="676.5">Controller.ConnexionController</node>
+    <node x="472.96904761904767" y="665.0">Controller.MainController</node>
+    <node x="194.50238095238097" y="136.0">Network.ConnexionManager</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Controller.MainController" target="Controller.FriendViewController">
+      <point x="124.79999999999995" y="-61.5" />
+      <point x="753.7690476190476" y="645.0" />
+      <point x="784.1690476190477" y="645.0" />
+      <point x="82.66666666666674" y="108.0" />
+    </edge>
+    <edge source="Network.ConnexionManager.ManagerMode" target="Network.ConnexionManager">
+      <point x="52.39999999999998" y="38.0" />
+      <point x="328.99226190476185" y="106.0" />
+      <point x="497.002380952381" y="106.0" />
+      <point x="121.0" y="-234.5" />
+    </edge>
+    <edge source="App" target="Controller.MainController">
+      <point x="75.25" y="-49.5" />
+      <point x="488.12440476190477" y="828.0" />
+      <point x="706.9690476190476" y="828.0" />
+      <point x="78.0" y="61.5" />
+    </edge>
+    <edge source="App" target="Controller.ConnexionController">
+      <point x="-53.75" y="-49.5" />
+      <point x="359.12440476190477" y="818.0" />
+      <point x="105.5" y="818.0" />
+      <point x="-95.0" y="50.0" />
+    </edge>
+    <edge source="App" target="Network.ConnexionManager.ManagerMode">
+      <point x="-75.25" y="-49.5" />
+      <point x="337.62440476190477" y="828.0" />
+      <point x="0.0" y="828.0" />
+      <point x="0.0" y="96.0" />
+      <point x="224.1922619047619" y="96.0" />
+      <point x="-52.400000000000006" y="38.0" />
+    </edge>
+    <edge source="Controller.ConnexionController" target="Network.ConnexionManager.ManagerMode">
+      <point x="-126.66666666666669" y="-50.0" />
+      <point x="73.83333333333331" y="645.0" />
+      <point x="63.05833333333334" y="645.0" />
+      <point x="63.05833333333334" y="106.0" />
+      <point x="250.39226190476188" y="106.0" />
+      <point x="-26.19999999999999" y="38.0" />
+    </edge>
+    <edge source="Controller.MainController" target="Network.ConnexionManager">
+      <point x="-124.80000000000001" y="-61.5" />
+      <point x="504.16904761904766" y="645.0" />
+      <point x="479.7166666666667" y="645.0" />
+      <point x="103.71428571428572" y="234.5" />
+    </edge>
+    <edge source="Controller.ConnexionController" target="Network.ConnexionManager">
+      <point x="126.66666666666669" y="-50.0" />
+      <point x="327.1666666666667" y="645.0" />
+      <point x="272.2880952380953" y="645.0" />
+      <point x="-103.71428571428567" y="234.5" />
+    </edge>
+    <edge source="App" target="Network.ConnexionManager">
+      <point x="32.25" y="-49.5" />
+      <point x="445.12440476190477" y="828.0" />
+      <point x="443.6416666666667" y="828.0" />
+      <point x="443.6416666666667" y="645.0" />
+      <point x="427.85952380952386" y="645.0" />
+      <point x="51.85714285714289" y="234.5" />
+    </edge>
+    <edge source="Network.ConnexionManager" target="Network.ConnexionManager.ManagerMode">
+      <point x="0.0" y="-234.5" />
+      <point x="376.002380952381" y="116.0" />
+      <point x="302.79226190476186" y="116.0" />
+      <point x="26.19999999999999" y="38.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.9" x="497.68253968253885" y="505.22222222222223" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+    <Category>Constructors</Category>
+    <Category>Fields</Category>
+  </Categories>
+  <SCOPE>Project Files</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

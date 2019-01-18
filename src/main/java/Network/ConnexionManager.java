@@ -1,22 +1,17 @@
 package Network;
 
-import Model.*;
-import Security.Cryptography;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.SerializationUtils;
+import Model.Message;
+import Model.Signal;
+import Model.Type;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.math.BigInteger;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -51,100 +46,160 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 
 
-public class ConnexionManager extends Observable implements Runnable, Observer{
+public abstract class ConnexionManager<T> extends Observable implements Runnable, Observer{
 
     public enum ManagerMode{
         TEST(1),
-        BROADCAST(2);
+        BROADCAST(2),
+        SERVER(3);
         private int mode;
-        private ManagerMode(int i){
+        ManagerMode(int i){
             mode = i;
         }
     }
 
-	private ServerSocket serverSocket = null;
-	private String clientName = null;
-	private String tmpClientName = null;
-	private Vector<UserChatListener> friendList;
-	private HashMap<String, Integer> connectedUsers;
-    private HashMap<String, String> connectedUsers2;
+	protected ServerSocket serverSocket = null;
+	protected String clientName = null;
+	protected Vector<UserChatListener> friendList;
+	protected HashMap<String, T> connectedUsers;
 
-	private static final int portStart = 10000;
-	private static final int portEnd = 10005;
-	private int server_port = 0;
-    private ManagerMode mode = ManagerMode.TEST;
-    private NetworkScanner networkScanner;
-    private NetworkScanListener networkScanListener;
-    private String uniqueID = UUID.randomUUID().toString();
-	private boolean work;
+	protected int server_port = 0;
+    protected ManagerMode mode = null;
+	protected boolean work;
+
+	public ConnexionManager(){
+	    super();
+        init();
+    }
 
 	public ConnexionManager(ManagerMode mode){
-		super();
+		this();
         this.mode = mode;
-		init();
-
 	}
 
-	private void init(){
+    @Override
+    public void run() {
+        while (work){
+            try {
+                Socket socket = serverSocket.accept();
+                BufferedReader entreeDepuisClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                String msg = entreeDepuisClient.readLine();
+                System.out.println("Message: {" + msg + "}");
+                this.handleMessage(msg, socket);
+
+            }
+            catch (ConnectException e) {
+                System.out.println("except");//e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+	protected void init(){
 
 		work = true;
 		friendList = new Vector<>();
 		connectedUsers = new HashMap<>();
-        connectedUsers2 = new HashMap<>();
-		clientName = "%%NONE%%";
-        networkScanner = new NetworkScanner(uniqueID);
-        networkScanner.addObserver(this);
-        networkScanListener = null;
-		int randomNum = 0;
-		if(mode == ManagerMode.TEST) {
-            while (serverSocket == null) {
-                try {
-                    randomNum = ThreadLocalRandom.current().nextInt(portStart, portEnd);
-                    serverSocket = new ServerSocket(randomNum);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            server_port = randomNum;
+        clientName = "%%NONE%%";
+	}
 
-            //scanUsers();
+    protected abstract void sendUpdateInformation(String str);
+
+    protected void handleMessage(String msg, Socket socket){
+
+        System.out.println("\t\t************* DEB handleMessage");
+        if(msg == null || msg.isEmpty()){
+            System.out.println("Nothing handled");
+        }
+        else if (msg.contains("%&%")){
+            String uname = msg.split( "%&%")[0];
+            String order = msg.split("%&%")[1];
+
+            switch (order){
+                case "initConnection": {
+                    handleInitConnexion(uname, socket);
+                    UserChatListener u = new UserChatListener(uname, socket);
+                    (new Thread(u)).start();
+                    this.friendList.add(u);
+                    setChanged();
+                    notifyObservers(new Signal(Type.INIT_CHAT, uname));
+                    printUsers();
+                }
+                break;
+                case "scan":
+                    sendMessage(socket,clientName);
+                    setChanged();
+                    notifyObservers(new Signal(Type.SCAN, socket.getInetAddress().getHostAddress()));
+                    break;
+                case "connected":
+                    handleConnected(uname, socket);
+                    break;
+                case "disconnect":
+                    handleDisconnect(uname, socket, msg);
+                    setChanged();
+                    notifyObservers(new Signal(Type.DISCONNECT, uname));
+                    printUsers();
+                    break;
+                default:
+                    break;
+            }
+        }
+        System.out.println("\t\t************* END handle Message");
+    }
+
+    protected abstract void handleConnected(String uname, Socket socket);
+    protected abstract void handleDisconnect(String uname, Socket socket, String msg);
+    protected abstract void handleInitConnexion(String uname, Socket socket);
+
+    protected boolean isChattingWith(String uname) {
+        for (UserChatListener u : friendList) {
+            if (u.getNickname().equals(uname))
+                return true;
+        }
+        return false;
+    }
+
+    protected void printUsers(){
+        Set<Map.Entry<String, T>> setHm = connectedUsers.entrySet();
+
+        for (Map.Entry<String, T> e : setHm) {
+            System.out.println("username = [" + e.getKey() + "], value = [" + e.getValue() + "]");
+        }
+    }
+
+    protected UserChatListener getFriend(String username){
+        for (UserChatListener user: friendList) {
+            if(user.getNickname().compareTo(username) == 0)
+                return user;
+        }
+        return null;
+    }
+
+    protected void sendMessage(Socket socket, String msg){
+        if(socket != null && msg != null){
+
+            PrintWriter sortieVersClient = null;
             try {
-                serverSocket.close();
+                sortieVersClient = new PrintWriter(socket.getOutputStream());
+                sortieVersClient.println(msg);
+                sortieVersClient.flush();
+                System.out.println("Sended (socket)!!!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            //System.out.println("Scan finished");
         }
-		else if(mode == ManagerMode.BROADCAST)
-		    server_port = 11000;
+        else
+            System.out.println("CANNOT SEND MESSAGE socket = [" + socket + "], msg = [" + msg + "]");
+    }
 
-	}
-
-	@Override
-	public void run() {
-		while (work){
-			try {
-				Socket socket = serverSocket.accept();
-				BufferedReader entreeDepuisClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				String msg = entreeDepuisClient.readLine();
-				System.out.println("Message: {" + msg + "}");
-				this.handleMessage(msg, socket);
-
-			}
-			catch (ConnectException e) {
-				System.out.println("except");//e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-		try {
-			serverSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+    protected abstract void scanUsers();
 
 	public boolean sendMessage(Message m){
 		PrintWriter sortieVersClient = null;
@@ -171,36 +226,13 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 		return false;
 	}
 
-	public void sendMessage(Socket socket, String msg){
-		if(socket != null && msg != null){
-
-			PrintWriter sortieVersClient = null;
-			try {
-				sortieVersClient = new PrintWriter(socket.getOutputStream());
-				sortieVersClient.println(msg);
-				sortieVersClient.flush();
-				System.out.println("Sended (socket)!!!");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else
-			System.out.println("CANNOT SEND MESSAGE socket = [" + socket + "], msg = [" + msg + "]");
-	}
-
     public boolean initChat(String uname){
-        Integer port = null;
-        String ip = null;
-        port = connectedUsers.get(uname);
-        ip = connectedUsers2.get(uname);
-        if((port != null || ip!=null) && !isChattingWith(uname)){
+        T value = null;
+        value = connectedUsers.get(uname);
+        if(value != null && !isChattingWith(uname)){
             Socket s = null;
             try {
-                if(mode == ManagerMode.TEST)
-                    s = new Socket("localhost", port);
-                else
-                    s = new Socket(ip, 11000);
-
+                s = newSocket(value);
                 UserChatListener u = new UserChatListener(uname,s);
                 sendMessage(s,clientName + "%&%" + "initConnection");
                 (new Thread(u)).start();
@@ -213,125 +245,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
         return false;
     }
 
-	private void handleMessage(String msg, Socket socket){
-
-        System.out.println("\t\t************* Deb handleMessage");
-		if(msg == null || msg.isEmpty()){
-			System.out.println("Nothing handled");
-		}
-		else if (msg.contains("%&%")){
-			String uname = msg.split( "%&%")[0];
-			String order = msg.split("%&%")[1];
-
-			switch (order){
-				case "initConnection": {
-				    if(mode == ManagerMode.TEST)
-                        this.connectedUsers.put(uname,socket.getPort());
-                    else if(mode == ManagerMode.BROADCAST)
-                        this.connectedUsers2.put(uname, socket.getInetAddress().getAddress().toString());
-
-					UserChatListener u = new UserChatListener(uname, socket);
-                    (new Thread(u)).start();
-					this.friendList.add(u);
-					setChanged();
-					notifyObservers(new Signal(Type.INIT_CHAT, uname));
-					printUsers();
-				}
-				break;
-				case "scan":
-					sendMessage(socket,clientName);
-                    setChanged();
-                    notifyObservers(new Signal(Type.SCAN, socket.getInetAddress().getHostAddress()));
-					break;
-				case "disconnect":
-                    if (mode == ManagerMode.TEST) {
-                        this.connectedUsers.remove(uname);
-                        UserChatListener u = getFriend(uname);
-                        if (u != null) {
-                            u.setWorking(false);
-                            try {
-                                u.getSocket().close();
-                            } catch (IOException e) {
-                                System.out.println("Error when disconnecting: msg = [" + msg + "], socket = [" + socket + "]");
-                                e.printStackTrace();
-                            }
-                            this.friendList.remove(u);
-                            u = null;
-                        }
-                        System.out.println("User [" + uname + "] disconnected!!");
-                    }
-                        setChanged();
-                        notifyObservers(new Signal(Type.DISCONNECT, uname));
-                        printUsers();
-					break;
-				case "connected":
-                    if (mode == ManagerMode.TEST) {
-//                    System.out.println("getPort() = [" + socket.getRemoteSocketAddress().toString() + "], getLocalPort = [" + socket.getLocalPort() + "]");
-                        this.connectedUsers.put(uname, socket.getPort());
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        scanUsers();
-
-                        printUsers();
-                        setChanged();
-                        notifyObservers(new Signal(Type.CONNECT, uname));
-                    }
-					break;
-				default:
-					break;
-			}
-		}
-
-
-        System.out.println("\t\t************* END handle Message");
-	}
-
-	public void scanUsers(){
-        System.out.println("\t\tScan Users");
-        if (mode == ManagerMode.TEST) {
-            long a = System.currentTimeMillis();
-            for (int i = portStart; i < portEnd; i++) {
-                if (i != server_port && !connectedUsers.containsValue(i)) {
-                    try {
-                        Socket socket = new Socket("localhost", i);
-                        socket.setSoTimeout(50);
-                        BufferedReader entreeDepuisClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        PrintWriter sortieVersClient = new PrintWriter(socket.getOutputStream());
-                        sortieVersClient.println(" " + "%&%" + "scan");
-                        sortieVersClient.flush();
-//					System.out.println("Port " + i + " user number: " + (connectedUsers.size() + 1));
-                        String username = entreeDepuisClient.readLine();
-                        System.out.println("new user: " + username);
-                        //User u = new User(username, socket);
-
-                        this.connectedUsers.put(username, i);
-                        entreeDepuisClient.close();
-                        sortieVersClient.close();
-
-                    } catch (SocketTimeoutException e) {
-                        System.out.println("timeout");
-                    } catch (ConnectException e) {
-                    System.out.println("not opened");//e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            System.out.println("time = " + (System.currentTimeMillis() - a));
-            printUsers();
-            System.out.println("\t\tEnd Scan");
-        }
-        else if(mode == ManagerMode.BROADCAST){
-            try {
-                networkScanner.scanNetwork();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-	}
+    protected abstract Socket newSocket(T value) throws IOException;
 
 	public void sendUpdateToFriends(String msg){
 		for (UserChatListener chatListener : friendList) {
@@ -339,87 +253,14 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 		}
 	}
 
-	public void sendUpdateToConnected(String msg){
-
-		Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
-		Iterator<Map.Entry<String, Integer>> it = setHm.iterator();
-
-		while(it.hasNext()){
-
-            Map.Entry<String, Integer> e = it.next();
-            UserChatListener u = getFriend(e.getKey());
-            try {
-                if(u == null){
-                        Socket s = new Socket("localhost",e.getValue());
-                        sendMessage(s,msg);
-                }
-                else
-                    sendMessage(u.getSocket(),msg);
-            }
-            catch (IOException e1) {
-                e1.printStackTrace();
-            }
-		}
-	}
-
-	private boolean isChattingWith(String uname) {
-		for (UserChatListener u : friendList) {
-			if (u.getNickname().equals(uname))
-				return true;
-		}
-		return false;
-	}
-
-	public void isUsed(String nickname) {
-	    if(mode == ManagerMode.TEST) {
-            scanUsers();
-
-            boolean isUsed = connectedUsers.containsKey(nickname);
-            setChanged();
-            if(isUsed){
-                notifyObservers(new Signal(Type.BAD_USERNAME, ""));
-            }
-            else{
-                notifyObservers(new Signal(Type.GOOD_USERNAME, ""));
-                printUsers();
-            }
-        }
-        else if(mode == ManagerMode.BROADCAST){
-            tmpClientName = nickname;
-            try {
-                networkScanner = new NetworkScanner(uniqueID);
-                networkScanner.addObserver(this);
-                networkScanner.scanNetwork();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-	}
+	public abstract void connect(String nickname);
 
 	public boolean getWork() {
 		return work;
 	}
 
 	public void setWork(boolean work) {
-		if(this.networkScanListener != null){
-            ScanMessage msg = new ScanMessage(ScanMessage.ScanType.DISCONNECT,networkScanListener.getVersionNumber(),clientName);
-            msg.uniqueID = uniqueID;
-            try {
-                NetworkScanner.broadcastToAll(SerializationUtils.serialize(msg));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         this.work = work;
-	}
-
-	public UserChatListener getFriend(String username){
-		for (UserChatListener user: friendList) {
-			if(user.getNickname().compareTo(username) == 0)
-				return user;
-		}
-		return null;
 	}
 
 	public String getClientName() {
@@ -435,53 +276,9 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 			e.printStackTrace();
 		}
 		this.clientName = clientName;
-
-        if(mode == ManagerMode.TEST)
-		    this.sendUpdateToConnected(clientName+"%&%"+"connected");
-        else if(mode == ManagerMode.BROADCAST){
-            sendUpdateInformation();
-        }
+		sendUpdateInformation(clientName+"%&%"+"connected");
 		printUsers();
-
         System.out.println("\t\t************* END set client name");
-	}
-
-	private void sendUpdateInformation(){
-        ScanMessage msg = new ScanMessage(ScanMessage.ScanType.UPDATE_INFORMATION,networkScanListener.getVersionNumber(),clientName);
-        msg.uniqueID = uniqueID;
-        try {
-            NetworkScanner.broadcastToAll(SerializationUtils.serialize(msg));
-            System.out.println("\n\nI AM THE NEW RESPONDER OF BROADCAST MESSAGES [" + networkScanListener.getVersionNumber() + "]\n\n");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-	public void printUsers(){
-        if (mode == ManagerMode.TEST) {
-            Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
-            Iterator<Map.Entry<String, Integer>> it = setHm.iterator();
-
-            while (it.hasNext()) {
-
-                Map.Entry<String, Integer> e = it.next();
-
-                System.out.println("username = [" + e.getKey() + "], port = [" + e.getValue() + "]");
-
-            }
-        }
-        else if(mode == ManagerMode.BROADCAST){
-            Set<Map.Entry<String, String>> setHm = connectedUsers2.entrySet();
-            Iterator<Map.Entry<String, String>> it = setHm.iterator();
-
-            while (it.hasNext()) {
-
-                Map.Entry<String, String> e = it.next();
-
-                System.out.println("username = [" + e.getKey() + "], ip = [" + e.getValue() + "]");
-
-            }
-        }
 	}
 
     public Vector<UserChatListener> getFriendList() {
@@ -490,25 +287,9 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
 
     public Vector<String> getConnectedUsersName(){
 	    Vector<String> res = new Vector<>();
-        if (mode == ManagerMode.TEST) {
-            Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
-            Iterator<Map.Entry<String, Integer>> it = setHm.iterator();
-
-            while(it.hasNext()){
-
-                Map.Entry<String, Integer> e = it.next();
-                res.add(e.getKey());
-            }
-        }
-        else if (mode == ManagerMode.BROADCAST){
-            Set<Map.Entry<String, String>> setHm = connectedUsers2.entrySet();
-            Iterator<Map.Entry<String, String>> it = setHm.iterator();
-
-            while(it.hasNext()){
-
-                Map.Entry<String, String> e = it.next();
-                res.add(e.getKey());
-            }
+        Set<Map.Entry<String, T>> setHm = connectedUsers.entrySet();
+        for (Map.Entry<String, T> e : setHm) {
+            res.add(e.getKey());
         }
         return  res;
     }
@@ -517,7 +298,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
         for (UserChatListener l: friendList) {
             l.setWorking(false);
         }
-	    sendUpdateToConnected(clientName+"%&%"+"disconnect");
+	    sendUpdateInformation(clientName+"%&%"+"disconnect");
     }
 
     public void addIncomingMessageListener(String uname,Observer observer){
@@ -528,44 +309,7 @@ public class ConnexionManager extends Observable implements Runnable, Observer{
     }
 
     @Override
-    public void update(Observable observable, Object o) {
-
-        if(observable.getClass() == NetworkScanner.class){
-            //recu message de type Return Information
-            ScanMessage msg = (ScanMessage) o;
-
-            if(msg.uniqueID.equals(this.uniqueID) || !msg.clients.containsKey(tmpClientName)) {
-                this.connectedUsers2 = (HashMap<String, String>) msg.clients.clone();
-                if(msg.newUsername!=null && !this.tmpClientName.equals(msg.newUsername))
-                    this.connectedUsers2.put(msg.newUsername, msg.ip);
-                networkScanListener = new NetworkScanListener(tmpClientName, msg.clients, msg.newUserVersion, msg.newUserVersion, uniqueID);
-                networkScanListener.listen();
-                networkScanListener.addObserver(this);
-                setChanged();
-                notifyObservers(new Signal(Type.GOOD_USERNAME, ""));
-            }
-            else{
-                setChanged();
-                notifyObservers(new Signal(Type.BAD_USERNAME, ""));
-            }
-        }
-        else if(observable.getClass() == NetworkScanListener.class){
-            ScanMessage msg = (ScanMessage) o;
-            if(msg.type == ScanMessage.ScanType.UPDATE_INFORMATION){
-                connectedUsers2.put(msg.newUsername, msg.ip);
-                printUsers();
-                setChanged();
-                notifyObservers(new Signal(Type.CONNECT, msg.newUsername));
-            }
-            if (msg.type == ScanMessage.ScanType.DISCONNECT){
-                connectedUsers2.remove(msg.newUsername);
-                friendList.removeIf( friend -> friend.nickname.equals(msg.newUsername) );
-                printUsers();
-                setChanged();
-                notifyObservers(new Signal(Type.DISCONNECT, msg.newUsername));
-            }
-        }
-    }
+    public void update(Observable observable, Object o) {}
 
     public ManagerMode getMode() {
         return mode;

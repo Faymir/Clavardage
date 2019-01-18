@@ -3,7 +3,7 @@ package Controller;
 import Model.Database;
 import Model.Signal;
 import Model.Type;
-import Network.ConnexionManager;
+import Network.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,7 +21,6 @@ import java.util.Observer;
 public class ConnexionController implements Observer
 {
 
-    private ConnexionManager connManager;
     private FXMLLoader mainWindow;
 
     @FXML
@@ -36,8 +35,7 @@ public class ConnexionController implements Observer
     @FXML
     private Label errorLabel;
 
-    public ConnexionController(ConnexionManager connexionManager, FXMLLoader mainWindow){
-        connManager = connexionManager;
+    public ConnexionController(FXMLLoader mainWindow){
         this.mainWindow = mainWindow;
     }
 
@@ -55,35 +53,40 @@ public class ConnexionController implements Observer
     }
 
     @FXML
-    void usernameKeyReleased(KeyEvent event){
+    void usernameKeyReleased(KeyEvent event) throws UnsupportedClassException{
         if(event.getCode().getName().equals("Enter"))
             validate();
     }
 
     @FXML
-    void validateClicked(ActionEvent event) {
+    void validateClicked(ActionEvent event) throws UnsupportedClassException {
         validate();
     }
     @FXML
-    void checkBoxClicked(ActionEvent event) {
-        connManager.setMode((modeCheckBox.isSelected())? ConnexionManager.ManagerMode.BROADCAST: ConnexionManager.ManagerMode.TEST);
-        System.out.println("event = [" + event + "] value = [" + modeCheckBox.isSelected() + "] mode = [" + connManager.getMode() + "]");
+    void checkBoxClicked(ActionEvent event){
+        //System.out.println("event = [" + event + "] value = [" + modeCheckBox.isSelected() + "] mode = [" + connManager.getMode() + "]");
     }
 
-    private void validate(){
+    private void validate() throws UnsupportedClassException {
+
+        if (modeCheckBox.isSelected())
+            SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(BroadcastConnexionManager.class);
+        else
+            SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(LocalConnexionManager.class);
+
         String username = usernameTextEdit.getText();
 
         if(username.isEmpty())
             return;
         progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         usernameTextEdit.setDisable(true);
-        connManager.addObserver(this);
-        connManager.isUsed(username);
+        SharedObjects.get().connManager.addObserver(this);
+        SharedObjects.get().connManager.connect(username);
     }
 
     @Override
     public void update(Observable observable, Object o) {
-        if(observable.getClass() == ConnexionManager.class) {
+        if(observable.getClass() == BroadcastConnexionManager.class || observable.getClass() == LocalConnexionManager.class) {
             usernameTextEdit.setDisable(false);
             Signal s = (Signal) o;
             if (s.type == Type.BAD_USERNAME) {
@@ -107,8 +110,8 @@ public class ConnexionController implements Observer
                             errorLabel.setText("Username is valid");
                         }
                 );
-                connManager.setClientName(username);
-                (new Thread(connManager)).start();
+                SharedObjects.get().connManager.setClientName(username);
+                (new Thread(SharedObjects.get().connManager)).start();
                 Stage stage = (Stage) (usernameTextEdit).getScene().getWindow();
                 Platform.runLater(
                             () -> {
