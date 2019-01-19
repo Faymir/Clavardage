@@ -43,6 +43,9 @@ public class WebViewData {
             /*String current = System.getProperty("user.dir") + "/View/";
 
             System.out.println("\n\nRessources = "+ getClass().getResource("../head.html").getPath() + "\n\n");*/
+
+            System.out.println("WebViewData user.dir = [" + System.getProperty("user.dir") + "]");
+            System.out.println("WebViewData user.dir = [" + getClass().getResource("../resources/head.html") + "]");
             vanillaHead = new String(Files.readAllBytes(Paths.get(/*current +*/ FileLoader.getInstance().getPath("head.html"))));
             head = vanillaHead + "<div class=\"card-body msg_card_body\">";
             tail = new String(Files.readAllBytes(Paths.get(/*current +*/FileLoader.getInstance().getPath("tail.html"))));

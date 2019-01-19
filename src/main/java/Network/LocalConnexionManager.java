@@ -153,4 +153,10 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
             printUsers();
         }
     }
+
+
+    @Override
+    public void disconnect() {
+        sendUpdateInformation(clientName+"%&%"+"disconnect");
+    }
 }

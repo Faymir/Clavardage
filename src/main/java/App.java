@@ -20,6 +20,8 @@ public class App extends Application {
         primaryStage = stage;
         //UI INIT
 
+        System.out.println("App user.dir = [" + System.getProperty("user.dir") + "]");
+        System.out.println("App user.dir = [" + getClass().getResource("resources/template.fxml") + "]");
         FXMLLoader root = new FXMLLoader(FileLoader.getInstance().get("template.fxml"));
         MainController mainController = new MainController(stage);
         root.setController(mainController);
@@ -56,9 +58,11 @@ public class App extends Application {
     @Override
     public void stop(){
         System.out.println("Stage is closing");
-        SharedObjects.get().connManager.setWork(false);
-        SharedObjects.get().connManager.sendDisconnect();
-        SharedObjects.get().connManager = null;
+        if (SharedObjects.get().connManager != null){
+            SharedObjects.get().connManager.setWork(false);
+            SharedObjects.get().connManager.sendDisconnect();
+            SharedObjects.get().connManager = null;
+        }
         primaryStage.close();
         primaryStage = null;
         System.exit(0);

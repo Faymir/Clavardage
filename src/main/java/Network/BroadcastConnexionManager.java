@@ -15,7 +15,6 @@ public class BroadcastConnexionManager extends ConnexionManager<String> {
     protected String tmpClientName = null;
     protected NetworkScanner networkScanner;
     protected NetworkScanListener networkScanListener;
-    protected String uniqueID = UUID.randomUUID().toString();
 
     public BroadcastConnexionManager() {
         super(ManagerMode.BROADCAST);
@@ -82,8 +81,7 @@ public class BroadcastConnexionManager extends ConnexionManager<String> {
     }
 
     @Override
-    public void setWork(boolean work) {
-        super.setWork(work);
+    public void disconnect() {
         if(this.networkScanListener != null && !work){
             ScanMessage msg = new ScanMessage(ScanMessage.ScanType.DISCONNECT,networkScanListener.getVersionNumber(),clientName);
             msg.uniqueID = uniqueID;
@@ -127,7 +125,7 @@ public class BroadcastConnexionManager extends ConnexionManager<String> {
             }
             if (msg.type == ScanMessage.ScanType.DISCONNECT){
                 connectedUsers.remove(msg.newUsername);
-                friendList.removeIf( friend -> friend.nickname.equals(msg.newUsername) );
+                friendList.removeIf( friend -> friend.getNickname().equals(msg.newUsername) );
                 printUsers();
                 setChanged();
                 notifyObservers(new Signal(Type.DISCONNECT, msg.newUsername));

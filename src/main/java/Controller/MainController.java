@@ -4,10 +4,7 @@ package Controller;
  */
 
 import Model.*;
-import Network.BroadcastConnexionManager;
-import Network.ConnexionManager;
-import Network.LocalConnexionManager;
-import Network.SharedObjects;
+import Network.*;
 import Security.Cryptography;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -316,6 +313,9 @@ public class MainController implements Observer {
 
             FXMLLoader view = null;
             try {
+
+                System.out.println("MainController user.dir = [" + System.getProperty("user.dir") + "]");
+                System.out.println("MainController user.dir = [" + getClass().getResource("../resources/friendview.fxml") + "]");
                 view = new FXMLLoader(FileLoader.getInstance().get("friendView.fxml"));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -345,7 +345,9 @@ public class MainController implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if (observable.getClass() == BroadcastConnexionManager.class || observable.getClass() == LocalConnexionManager.class){
+        if (observable.getClass() == BroadcastConnexionManager.class
+                || observable.getClass() == LocalConnexionManager.class
+                || observable.getClass() == ServerConnexionManager.class){
             Signal s = (Signal) o;
 
             switch (s.type){

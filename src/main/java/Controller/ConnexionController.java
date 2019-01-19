@@ -4,6 +4,7 @@ import Model.Database;
 import Model.Signal;
 import Model.Type;
 import Network.*;
+import com.sun.imageio.spi.RAFImageInputStreamSpi;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,10 +31,16 @@ public class ConnexionController implements Observer
     private TextField usernameTextEdit;
 
     @FXML
-    private CheckBox modeCheckBox;
+    private Label errorLabel;
 
     @FXML
-    private Label errorLabel;
+    private RadioButton testRadioButton;
+
+    @FXML
+    private RadioButton broadcastRadioButton;
+
+    @FXML
+    private RadioButton serverRadioButton;
 
     public ConnexionController(FXMLLoader mainWindow){
         this.mainWindow = mainWindow;
@@ -43,7 +50,9 @@ public class ConnexionController implements Observer
     public void initialize(){
 
         System.out.println("Initialize connexion window");
-        this.modeCheckBox.setSelected(true);
+        testRadioButton.setSelected(false);
+        broadcastRadioButton.setSelected(true);
+        serverRadioButton.setSelected(false);
     }
 
     @FXML
@@ -62,17 +71,36 @@ public class ConnexionController implements Observer
     void validateClicked(ActionEvent event) throws UnsupportedClassException {
         validate();
     }
+
     @FXML
-    void checkBoxClicked(ActionEvent event){
-        //System.out.println("event = [" + event + "] value = [" + modeCheckBox.isSelected() + "] mode = [" + connManager.getMode() + "]");
+    void radioToogled(ActionEvent event){
+        testRadioButton.setSelected(false);
+        broadcastRadioButton.setSelected(false);
+        serverRadioButton.setSelected(false);
+        switch (((RadioButton)event.getSource()).getText()){
+            case "Test":
+                testRadioButton.setSelected(true);
+                break;
+            case "Broadcast":
+                broadcastRadioButton.setSelected(true);
+                break;
+            case "Server":
+                serverRadioButton.setSelected(true);
+                break;
+            default:
+                break;
+        }
+        //System.out.println("event = [" + ((RadioButton)event.getSource()).getText() + "]");
     }
 
     private void validate() throws UnsupportedClassException {
 
-        if (modeCheckBox.isSelected())
-            SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(BroadcastConnexionManager.class);
-        else
+        if (testRadioButton.isSelected())
             SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(LocalConnexionManager.class);
+        else if (broadcastRadioButton.isSelected())
+            SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(BroadcastConnexionManager.class);
+        else if(serverRadioButton.isSelected())
+            SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(ServerConnexionManager.class);
 
         String username = usernameTextEdit.getText();
 
@@ -86,7 +114,9 @@ public class ConnexionController implements Observer
 
     @Override
     public void update(Observable observable, Object o) {
-        if(observable.getClass() == BroadcastConnexionManager.class || observable.getClass() == LocalConnexionManager.class) {
+        if(observable.getClass() == BroadcastConnexionManager.class
+                || observable.getClass() == LocalConnexionManager.class
+                || observable.getClass() == ServerConnexionManager.class) {
             usernameTextEdit.setDisable(false);
             Signal s = (Signal) o;
             if (s.type == Type.BAD_USERNAME) {

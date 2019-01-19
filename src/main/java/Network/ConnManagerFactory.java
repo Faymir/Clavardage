@@ -7,6 +7,8 @@ public class ConnManagerFactory {
             return new BroadcastConnexionManager();
         else if (type == LocalConnexionManager.class)
             return new LocalConnexionManager();
+        else if(type == ServerConnexionManager.class)
+            return new ServerConnexionManager();
         else
             throw new UnsupportedClassException("This class is not supported byt this Factory");
     }

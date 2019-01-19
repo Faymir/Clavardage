@@ -52,10 +52,13 @@ public class ServerUser implements Comparable<ServerUser>, Serializable {
 
 
     public static ServerUser fromJsonObject(JSONObject obj){
+        String id = "";
+        if(obj.toString().contains("uniqueId"))
+            id = obj.getString("uniqueId");
         return new ServerUser(obj.getString("ip"),
                 obj.getBoolean("online"),
                 obj.getString("username"),
-                obj.getString("uniqueId"));
+                id);
     }
 
     @Override

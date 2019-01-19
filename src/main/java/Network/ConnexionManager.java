@@ -8,9 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ConnectException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.*;
 
 
@@ -58,24 +56,26 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
         }
     }
 
-	protected ServerSocket serverSocket = null;
-	protected String clientName = null;
-	protected Vector<UserChatListener> friendList;
-	protected HashMap<String, T> connectedUsers;
+    protected ServerSocket serverSocket = null;
+    protected String clientName = null;
+    protected Vector<UserChatListener> friendList;
+    protected HashMap<String, T> connectedUsers;
 
-	protected int server_port = 0;
+    protected int server_port = 0;
     protected ManagerMode mode = null;
-	protected boolean work;
+    protected boolean work;
+    protected String serverUrl = null;
+    protected String uniqueID = UUID.randomUUID().toString();
 
-	public ConnexionManager(){
-	    super();
+    public ConnexionManager(){
+        super();
         init();
     }
 
-	public ConnexionManager(ManagerMode mode){
-		this();
+    public ConnexionManager(ManagerMode mode){
+        this();
         this.mode = mode;
-	}
+    }
 
     @Override
     public void run() {
@@ -102,13 +102,13 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
         }
     }
 
-	protected void init(){
+    protected void init(){
 
-		work = true;
-		friendList = new Vector<>();
-		connectedUsers = new HashMap<>();
+        work = true;
+        friendList = new Vector<>();
+        connectedUsers = new HashMap<>();
         clientName = "%%NONE%%";
-	}
+    }
 
     protected abstract void sendUpdateInformation(String str);
 
@@ -166,12 +166,13 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
         return false;
     }
 
-    protected void printUsers(){
+    public void printUsers(){
         Set<Map.Entry<String, T>> setHm = connectedUsers.entrySet();
 
         for (Map.Entry<String, T> e : setHm) {
             System.out.println("username = [" + e.getKey() + "], value = [" + e.getValue() + "]");
         }
+        System.out.println("=====================");
     }
 
     protected UserChatListener getFriend(String username){
@@ -201,30 +202,30 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
 
     protected abstract void scanUsers();
 
-	public boolean sendMessage(Message m){
-		PrintWriter sortieVersClient = null;
-		initChat(m.getReceiver());
-		UserChatListener u = getFriend(m.getReceiver());
-		if(u != null){
-			try {
+    public boolean sendMessage(Message m){
+        PrintWriter sortieVersClient = null;
+        initChat(m.getReceiver());
+        UserChatListener u = getFriend(m.getReceiver());
+        if(u != null){
+            try {
 //                System.out.println("getPort() = [" + u.getSocket().getPort() + "], getLocalPort = [" + u.getSocket().getLocalPort() + "]");
-				sortieVersClient = new PrintWriter(u.getSocket().getOutputStream());
+                sortieVersClient = new PrintWriter(u.getSocket().getOutputStream());
 //                Cryptography crypt = new Cryptography(Database.getPrivateKey(), Database.getPublicKey());
 //                System.out.println("encrypted msg = [" + crypt.encryptToString(m.getMessage()) + "]");
-				sortieVersClient.println(m.getMessage());
-				sortieVersClient.flush();
-				System.out.println("Sended!!!");
-				return true;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			System.out.println("username = [" + m.getSender() + "], str = [" + m.getMessage() + "], size= [" + friendList.size() + "]\n");
-			printUsers();
-		}
-		return false;
-	}
+                sortieVersClient.println(m.getMessage());
+                sortieVersClient.flush();
+                System.out.println("Sended!!!");
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("username = [" + m.getSender() + "], str = [" + m.getMessage() + "], size= [" + friendList.size() + "]\n");
+            printUsers();
+        }
+        return false;
+    }
 
     public boolean initChat(String uname){
         T value = null;
@@ -247,46 +248,48 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
 
     protected abstract Socket newSocket(T value) throws IOException;
 
-	public void sendUpdateToFriends(String msg){
-		for (UserChatListener chatListener : friendList) {
-			sendMessage(chatListener.getSocket(), msg);
-		}
-	}
+    public void sendUpdateToFriends(String msg){
+        for (UserChatListener chatListener : friendList) {
+            sendMessage(chatListener.getSocket(), msg);
+        }
+    }
 
-	public abstract void connect(String nickname);
+    public abstract void connect(String nickname);
 
-	public boolean getWork() {
-		return work;
-	}
+    public boolean getWork() {
+        return work;
+    }
 
-	public void setWork(boolean work) {
+    public void setWork(boolean work) {
         this.work = work;
-	}
+        if (!work)
+            disconnect();
+    }
 
-	public String getClientName() {
-		return clientName;
-	}
+    public String getClientName() {
+        return clientName;
+    }
 
-	public void setClientName(String clientName) {
+    public void setClientName(String clientName) {
         System.out.println("\t\t************* set client name");
-		try {
+        try {
             System.out.println("server_port = [" + server_port + "]");
-			serverSocket = new ServerSocket(server_port);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		this.clientName = clientName;
-		sendUpdateInformation(clientName+"%&%"+"connected");
-		printUsers();
+            serverSocket = new ServerSocket(server_port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.clientName = clientName;
+        sendUpdateInformation(clientName+"%&%"+"connected");
+        printUsers();
         System.out.println("\t\t************* END set client name");
-	}
+    }
 
     public Vector<UserChatListener> getFriendList() {
         return friendList;
     }
 
     public Vector<String> getConnectedUsersName(){
-	    Vector<String> res = new Vector<>();
+        Vector<String> res = new Vector<>();
         Set<Map.Entry<String, T>> setHm = connectedUsers.entrySet();
         for (Map.Entry<String, T> e : setHm) {
             res.add(e.getKey());
@@ -294,17 +297,19 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
         return  res;
     }
 
+    public abstract void disconnect();
+
     public void sendDisconnect(){
         for (UserChatListener l: friendList) {
             l.setWorking(false);
         }
-	    sendUpdateInformation(clientName+"%&%"+"disconnect");
+        disconnect();
     }
 
     public void addIncomingMessageListener(String uname,Observer observer){
-	    UserChatListener l = getFriend(uname);
-	    if(l != null){
-	        l.addObserver(observer);
+        UserChatListener l = getFriend(uname);
+        if(l != null){
+            l.addObserver(observer);
         }
     }
 
@@ -318,5 +323,9 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
     public void setMode(ManagerMode mode) {
         this.mode = mode;
         init();
+    }
+
+    public void setServerUrl(String serverUrl) throws MalformedURLException {
+        this.serverUrl = serverUrl;
     }
 }
