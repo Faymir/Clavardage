@@ -1,7 +1,10 @@
 package Network;
 
-import Model.ScanMessage;
+import Model.Signal;
+import Model.Type;
 import org.apache.commons.lang3.SerializationUtils;
+
+import Model.ScanMessage;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -65,15 +68,12 @@ public class NetworkScanListener extends Observable implements Observer {
     }
 
     public void handleScanMsg(ScanMessage msg){
-        System.out.println("msg ip = [" + msg.ip + "]");
         switch (msg.type){
             case DISCOVER:
                 if(versionNumber == lastVersion){
-
-
                     if(!connectedUsers.containsKey(uname))
-                        connectedUsers.put(uname,receiver.getOwnIp());
 
+                        connectedUsers.put(uname,receiver.getOwnIp());
                     Set<Map.Entry<String, String>> setHm = connectedUsers.entrySet();
                     Iterator<Map.Entry<String, String>> it = setHm.iterator();
 
@@ -90,7 +90,8 @@ public class NetworkScanListener extends Observable implements Observer {
                             lastVersion + 1);
                     message.newUsername = uname;
                     message.uniqueID = uniqueID;
-                    System.out.println("\n\nI WAS THE RESPONDER OF BROADCAST MESSAGES [" + lastVersion + "]\n\n");
+
+                    System.out.println("\n\n I WAS THE RESPONDER OF BROADCAST MESSAGES [" + lastVersion + "]\n\n");
                     System.out.println("return info " + connectedUsers.size() + " to ip[ " + msg.ip + "]");
                     try {
                         NetworkScanner.broadcast(SerializationUtils.serialize(message), InetAddress.getByName(msg.ip));
@@ -100,7 +101,11 @@ public class NetworkScanListener extends Observable implements Observer {
                 }
                 break;
             case RETURN_INFORMATION:
-                System.out.println("THIS MESSAGE SHOULD NEVER SHOW(NetworkScanner Handle Msg): msg = [" + msg + "]");
+                //TODO: on entre de cas lorsque la réponse au scan a pris du temps
+                // avant d'arriver, er donc ce client s'est pris pour le seul utilisateur
+                // en ligne il faudrait lui dire qu'en fait non! et qu'il faille qu'il se
+                // mette à jour. Mais j'ai la flemme pour ca.
+                System.out.println("THIS MESSAGE SHOULD NEVER SHOW(Network.NetworkScanner Handle Msg): msg = [" + msg + "]");
                 break;
             case UPDATE_INFORMATION:
                 connectedUsers.put(msg.newUsername, msg.ip);
@@ -113,7 +118,14 @@ public class NetworkScanListener extends Observable implements Observer {
                     notifyObservers(msg);
                 }
                 break;
+            case CHANGE_USER_NAME:
+                String ip = connectedUsers.remove(msg.oldUsername);
+                connectedUsers.put(msg.newUsername, ip);
+                setChanged();
+                notifyObservers(new Signal(Type.USERNAME_CHANGED, msg.oldUsername, msg.newUsername));
+                break;
             case DISCONNECT:
+
                 versions.removeIf( a -> a == msg.newUserVersion);
                 boolean responder = false;
 
@@ -125,8 +137,8 @@ public class NetworkScanListener extends Observable implements Observer {
                 else
                     responder = true;
 
-                if (responder){
-                    System.out.println("\n\n\n\t\t I SHOULD BE THE NEW RESPONDER \n\n");
+                if (responder) {
+                    System.out.println("\nI SHOULD BE THE NEW RESPONDER\n");
                     this.versionNumber = lastVersion;
                 }
                 connectedUsers.remove(msg.newUsername);
@@ -135,8 +147,9 @@ public class NetworkScanListener extends Observable implements Observer {
                     notifyObservers(msg);
                 }
                 break;
+
             default:
-                System.out.println("THIS MESSAGE SHOULD NEVER SHOW(NetworkScanner Handle Msg default switch): msg = [" + msg + "]");
+                System.out.println("THIS MESSAGE SHOULD NEVER SHOW(Network.NetworkScanner Handle Msg default switch): msg = [" + msg + "]");
                 break;
         }
     }
@@ -153,6 +166,12 @@ public class NetworkScanListener extends Observable implements Observer {
             e.printStackTrace();
         }
 
+    }
+
+    public void changeUserName(String newUsername){
+        String ip = connectedUsers.remove(uname);
+        connectedUsers.put(newUsername, ip);
+        uname = newUsername;
     }
 
     public int getVersionNumber() {

@@ -112,6 +112,24 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
 
     protected abstract void sendUpdateInformation(String str);
 
+    protected abstract void sendUserNameChanged(String newUsername); //Update Local information and send new username to others
+
+    public boolean changeUsername(String newUsername){
+        if(connectedUsers.containsKey(newUsername))
+            return false;
+
+        System.out.println("************* set client name");
+        sendUserNameChanged(newUsername);
+        this.clientName = newUsername;
+        printUsers();
+        System.out.println("************* END set client name");
+        return true;
+    }
+
+    public boolean isUsernameExist(String uname){
+        return connectedUsers.containsKey(uname) || clientName.equals(uname);
+    }
+
     protected void handleMessage(String msg, Socket socket){
 
         System.out.println("\t\t************* DEB handleMessage");
@@ -126,8 +144,8 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
                 case "initConnection": {
                     handleInitConnexion(uname, socket);
                     UserChatListener u = new UserChatListener(uname, socket);
-                    (new Thread(u)).start();
                     this.friendList.add(u);
+                    (new Thread(u)).start();
                     setChanged();
                     notifyObservers(new Signal(Type.INIT_CHAT, uname));
                     printUsers();
@@ -145,6 +163,16 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
                     handleDisconnect(uname, socket, msg);
                     setChanged();
                     notifyObservers(new Signal(Type.DISCONNECT, uname));
+                    printUsers();
+                    break;
+                case "newUsername":
+                    String oldUname = uname.split("---")[0], newUname = uname.split("---")[1];
+                    T port  = this.connectedUsers.remove(oldUname);
+                    this.connectedUsers.put(newUname, port);
+                    getFriend(oldUname).setNickname(oldUname);
+                    System.out.println("Username changed from [" + oldUname + "] to [" + newUname + "]");
+                    setChanged();
+                    notifyObservers(new Signal(Type.USERNAME_CHANGED, oldUname, newUname));
                     printUsers();
                     break;
                 default:
@@ -271,7 +299,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
     }
 
     public void setClientName(String clientName) {
-        System.out.println("\t\t************* set client name");
         try {
             System.out.println("server_port = [" + server_port + "]");
             serverSocket = new ServerSocket(server_port);
@@ -281,7 +308,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
         this.clientName = clientName;
         sendUpdateInformation(clientName+"%&%"+"connected");
         printUsers();
-        System.out.println("\t\t************* END set client name");
     }
 
     public Vector<UserChatListener> getFriendList() {

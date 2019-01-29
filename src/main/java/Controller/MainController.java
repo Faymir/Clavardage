@@ -13,6 +13,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
@@ -91,13 +92,7 @@ public class MainController implements Observer {
         friends = new Vector<>();
         friendViews = new Vector<>();
         discussion = new WebViewData();
-        String img = "";
-        try {
-            img = Base64.encodeBase64String(Files.readAllBytes(FileLoader.getInstance().getPathObject("bird.jpg")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Message m = new Message("friend", Calendar.getInstance().getTime(), "<img src=\"data:image/png;base64, " + img + "\"/>", null);
+        Message m = new Message("friend", Calendar.getInstance().getTime(), urltoImgTag("http://webresizer.com/images2/bird1_after.jpg"), null);
         discussion.addMessage(m, false);
     }
 
@@ -106,6 +101,11 @@ public class MainController implements Observer {
 
         SharedObjects.get().connManager.addObserver(this);
         initContextMenu();
+        usernameLabel.setOnMouseClicked(event -> {
+            if(event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
+                changeUsername(null);
+            }
+        });
         discussion.loadDiscussion();
         discussionWebview.getEngine().loadContent(discussion.getHtml());
         usernameLabel.setText(SharedObjects.get().connManager.getClientName());
@@ -129,11 +129,6 @@ public class MainController implements Observer {
     }
 
     @FXML
-    void testFunction(MouseEvent event) {
-
-    }
-
-    @FXML
     void textFieldKeyReleased(KeyEvent event) {
     	
     	if( event.getCode().toString().equals("ENTER"))
@@ -146,12 +141,7 @@ public class MainController implements Observer {
 
     @FXML
     void newFileClicked(ActionEvent event){
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Folder");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
-        File path = fileChooser.showOpenDialog(stage);
+        File path = openFileChooser();
         System.out.println(path);
         if(path == null) {
             return;
@@ -170,6 +160,57 @@ public class MainController implements Observer {
         result.ifPresent(url -> {
             sendImage(urltoImgTag(url));
         });
+    }
+
+    @FXML
+    void changeProfilePicture(ActionEvent event){
+        File picture = openFileChooser();
+
+        if(picture == null)
+            return;
+
+        try {
+            userAvatar.setImage(new Image(picture.toURI().toURL().toString(), true));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void changeUsername(ActionEvent event){
+        TextInputDialog dialog = new TextInputDialog("username");
+        dialog.setTitle("Username");
+        dialog.setHeaderText("");
+        dialog.setContentText("Enter your new username:");
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(newUname -> {
+            if(!SharedObjects.get().connManager.isUsernameExist(newUname)){
+                if(!Database.getInstance().checkExist(newUname, "user")) {
+                    if(SharedObjects.get().connManager.changeUsername(newUname)){
+                        Database.getInstance().changeUserName(SharedObjects.get().connManager.getClientName(), newUname);
+                        Platform.runLater(() -> {
+                            usernameLabel.setText(newUname);
+                        });
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION, "Alright!", ButtonType.YES);
+                        alert.showAndWait();
+                    }
+                }
+                else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "This user already exist on your computer.\nLogout and login with this new username", ButtonType.YES);
+                    alert.showAndWait();
+                }
+            }
+        });
+    }
+
+    private File openFileChooser(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Folder");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
+                new FileChooser.ExtensionFilter("All Files", "*.*"));
+        return fileChooser.showOpenDialog(stage);
     }
 
 //    @FXML
@@ -360,6 +401,8 @@ public class MainController implements Observer {
                 case DISCONNECT:
                     handleDisconnection(s);
                     break;
+                case USERNAME_CHANGED:
+                    handleUsernameChanged(s);
                 default:
                     break;
             }
@@ -404,6 +447,29 @@ public class MainController implements Observer {
             }
             //TODO: afficher une icone représentant le nombre de nouveau messages
         }
+    }
+
+    private void handleUsernameChanged(Signal s) {
+        User u = getFriend(s.message);
+        if (u!= null){
+            u.setUsername(s.newUsername);
+
+            if (discussion.getName().equals(s.message))
+                discussion.setFriend(s.newUsername, null);
+
+            if(Database.getInstance().checkExist(s.message, "friends")){
+                Database.getInstance().update(s.message, u);
+            }
+        }
+        Platform.runLater(() -> {
+            this.connectedUsersList.getItems().remove(s.message);
+            this.connectedUsersList.getItems().add(s.newUsername);
+            if (u!= null){
+                Objects.requireNonNull(getFriendView(s.message)).setNickname(s.newUsername);
+            }
+        });
+
+
     }
 
     public void saveData() {

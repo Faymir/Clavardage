@@ -125,6 +125,19 @@ public class Database implements Observer {
             selectKeys();
     }
 
+    public void changeUserName(String oldUname, String newUname){
+        String sql = "UPDATE USER set name = ? WHERE name = ?";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, oldUname);
+            pstmt.setString(2, newUname);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
+
     private static void executeQuery(String sql){
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {

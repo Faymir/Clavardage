@@ -42,11 +42,9 @@ public class UserChatListener extends Observable implements Runnable {
                     connected = false;
                     working = false;
                 }
-            } 
+            }
             catch(SocketException e) {
                 System.out.println("Connexion fermée pendant l'écoute");
-                connected = false;
-                working = false;
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -56,12 +54,13 @@ public class UserChatListener extends Observable implements Runnable {
                 System.out.println("Closed Socket");
             }
         }
-        System.out.println("Stopped Listening User: [" + nickname + "] maybe connection lost");
+        System.out.println("Stopped Listening Model.User: [" + nickname + "]");
     }
 
     private void notifyListeners(String msg){
         lastMessage = msg;
         asNewMessage = true;
+        //Cryptography cryp = new Cryptography("44449 47561", "24205 47561");
         System.out.println("Received [" + lastMessage + "] from ip : [" + socket.getInetAddress().getHostAddress() + "] from [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort()  + "]");
         Message m = new Message(nickname, Calendar.getInstance().getTime(),msg,null);
         setChanged();
@@ -88,5 +87,9 @@ public class UserChatListener extends Observable implements Runnable {
 
     public String getNickname() {
         return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }

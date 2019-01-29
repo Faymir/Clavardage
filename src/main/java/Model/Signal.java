@@ -3,6 +3,7 @@ package Model;
 public class Signal {
     public Type type;
     public String message;
+    public String newUsername;
     public int intValue;
     //public String from;
 
@@ -17,5 +18,10 @@ public class Signal {
         intValue = value;
     }
 
-//    public Signal(Type signalType, String from, String )
+    public Signal(Type signalType, String oldUsername, String newUsername){
+        this(signalType, oldUsername);
+        this.newUsername = newUsername;
+    }
+
+//    public fr.faymir.Model.Signal(fr.faymir.Model.Type signalType, String from, String )
 }

@@ -47,15 +47,24 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
 
     @Override
     protected void sendUpdateInformation(String str){
+        broadcastMsg(str);
+    }
+
+    @Override
+    protected void sendUserNameChanged(String newUsername) {
+        broadcastMsg("newUsername%&%" +clientName + "---" + newUsername);
+    }
+
+    protected void broadcastMsg(String msg){
         Set<Map.Entry<String, Integer>> setHm = connectedUsers.entrySet();
         for (Map.Entry<String, Integer> e : setHm) {
             UserChatListener u = getFriend(e.getKey());
             try {
                 if (u == null) {
                     Socket s = new Socket("localhost", e.getValue());
-                    sendMessage(s, str);
+                    sendMessage(s, msg);
                 } else
-                    sendMessage(u.getSocket(), str);
+                    sendMessage(u.getSocket(), msg);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

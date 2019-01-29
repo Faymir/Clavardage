@@ -29,7 +29,7 @@ public class ServerConnexionManager extends ConnexionManager<String> {
 
     public ServerConnexionManager() {
         super(ManagerMode.SERVER);
-        serverUrl = "http://192.168.1.101:8080/myapp/";
+        serverUrl = "http://node6669-clavadage.jcloud.ik-server.com/webapi/";
         server_port = 11000;
         clientName = null;
     }
@@ -37,6 +37,11 @@ public class ServerConnexionManager extends ConnexionManager<String> {
     @Override
     protected void sendUpdateInformation(String str) {
 
+    }
+
+    @Override
+    protected void sendUserNameChanged(String newUsername) {
+        //TODO: change Username
     }
 
     @Override
@@ -70,9 +75,10 @@ public class ServerConnexionManager extends ConnexionManager<String> {
         JSONObject response = getResponse("subscribe", "username", nickname);
         String responseType = response.get("Type").toString();
 
-        System.out.println("my uniqueId = [" + response.getString("uniqueId") + "]");
-        this.uniqueID = response.getString("uniqueId");
+        
         if(responseType.equals(Type.GOOD_USERNAME.toString())){
+        	System.out.println("my uniqueId = [" + response.getString("uniqueId") + "]");
+            this.uniqueID = response.getString("uniqueId");
             JSONArray users = response.getJSONArray("users");
             for (int i = 0; i < users.length(); i++) {
                 ServerUser u = ServerUser.fromJsonObject(users.getJSONObject(i));

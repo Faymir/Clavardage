@@ -35,11 +35,15 @@
                   <MenuItem mnemonicParsing="false" onAction="#sendUrlFile" text="Online File" />
                      </items></Menu>
             <SeparatorMenuItem mnemonicParsing="false" />
-            <MenuItem mnemonicParsing="false" text="Preferences…" />
-            <SeparatorMenuItem mnemonicParsing="false" />
             <MenuItem mnemonicParsing="false" text="Quit" />
           </items>
         </Menu>
+            <Menu mnemonicParsing="false" text="Preferences">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#changeProfilePicture" text="New Profile Picture" />
+                  <MenuItem mnemonicParsing="false" onAction="#changeUsername" text="change  Username" />
+               </items>
+            </Menu>
         <Menu mnemonicParsing="false" text="Help">
           <items>
             <MenuItem mnemonicParsing="false" text="About Clavardage" />
@@ -55,13 +59,13 @@
                      <children>
                         <HBox prefHeight="65.0" prefWidth="250.0">
                            <children>
-                              <ImageView fx:id="userAvatar" fitHeight="66.0" fitWidth="77.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
+                              <ImageView fx:id="userAvatar" fitHeight="66.0" fitWidth="99.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="ALWAYS">
                                  <image>
                                     <Image url="@blank_avatar.png" />
                                  </image>
                               </ImageView>
-                              <Separator prefHeight="4.0" prefWidth="91.0" HBox.hgrow="ALWAYS" />
-                              <Label fx:id="usernameLabel" alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="54.0" text="none" HBox.hgrow="NEVER" />
+                              <Separator prefHeight="26.0" prefWidth="81.0" HBox.hgrow="ALWAYS" />
+                              <Label fx:id="usernameLabel" alignment="CENTER_RIGHT" prefHeight="65.0" prefWidth="129.0" text="none" HBox.hgrow="NEVER" />
                            </children>
                         </HBox>
                         <TabPane fx:id="tabPane" prefHeight="662.0" prefWidth="250.0" tabClosingPolicy="UNAVAILABLE">
@@ -94,7 +98,7 @@
           <children>
                   <AnchorPane prefHeight="689.0" prefWidth="757.0" VBox.vgrow="ALWAYS">
                      <children>
-              <WebView fx:id="discussionWebview" maxHeight="-1.0" maxWidth="-1.0" onMouseClicked="#testFunction" prefHeight="126.0" prefWidth="775.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+              <WebView fx:id="discussionWebview" maxHeight="-1.0" maxWidth="-1.0" prefHeight="126.0" prefWidth="775.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children>
                   </AnchorPane>
             <HBox prefHeight="43.0" prefWidth="757.0" VBox.vgrow="NEVER">

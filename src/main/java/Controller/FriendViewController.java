@@ -77,6 +77,7 @@ public class FriendViewController extends Observable implements Observer {
 
     public void setNickname(String nickname){
         this.nickname = nickname;
+        friendViewUname.setText(nickname);
     }
 
     public String getNickname(){

@@ -33,18 +33,33 @@ public class BroadcastConnexionManager extends ConnexionManager<String> {
     @Override
     protected void sendUpdateInformation(String str){
         ScanMessage msg = new ScanMessage(ScanMessage.ScanType.UPDATE_INFORMATION,networkScanListener.getVersionNumber(),clientName);
+
+        if (broadcastMsg(msg))
+            System.out.println("\n\nI AM THE NEW RESPONDER OF BROADCAST MESSAGES [" + networkScanListener.getVersionNumber() + "]\n\n");
+    }
+
+    @Override
+    protected void sendUserNameChanged(String newUsername) {
+        ScanMessage msg = new ScanMessage(ScanMessage.ScanType.CHANGE_USER_NAME, newUsername);
+        msg.oldUsername = clientName;
+        broadcastMsg(msg);
+        networkScanListener.changeUserName(newUsername);
+    }
+
+    protected boolean broadcastMsg(ScanMessage msg){
         msg.uniqueID = uniqueID;
         try {
             NetworkScanner.broadcastToAll(SerializationUtils.serialize(msg));
-            System.out.println("\n\nI AM THE NEW RESPONDER OF BROADCAST MESSAGES [" + networkScanListener.getVersionNumber() + "]\n\n");
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     @Override
     protected void handleInitConnexion(String uname, Socket socket) {
-        this.connectedUsers.put(uname, socket.getInetAddress().getAddress().toString());
+        this.connectedUsers.put(uname, socket.getInetAddress().getHostAddress());
     }
 
     @Override
@@ -116,19 +131,34 @@ public class BroadcastConnexionManager extends ConnexionManager<String> {
             }
         }
         else if(observable.getClass() == NetworkScanListener.class){
-            ScanMessage msg = (ScanMessage) o;
-            if(msg.type == ScanMessage.ScanType.UPDATE_INFORMATION){
-                connectedUsers.put(msg.newUsername, msg.ip);
-                printUsers();
-                setChanged();
-                notifyObservers(new Signal(Type.CONNECT, msg.newUsername));
+            if(o.getClass() == ScanMessage.class){
+                ScanMessage msg = (ScanMessage) o;
+                if(msg.type == ScanMessage.ScanType.UPDATE_INFORMATION){
+                    connectedUsers.put(msg.newUsername, msg.ip);
+                    printUsers();
+                    setChanged();
+                    notifyObservers(new Signal(Type.CONNECT, msg.newUsername));
+                }
+                else if (msg.type == ScanMessage.ScanType.DISCONNECT){
+                    connectedUsers.remove(msg.newUsername);
+                    friendList.removeIf( friend -> friend.getNickname().equals(msg.newUsername) );
+                    printUsers();
+                    setChanged();
+                    notifyObservers(new Signal(Type.DISCONNECT, msg.newUsername));
+                }
             }
-            if (msg.type == ScanMessage.ScanType.DISCONNECT){
-                connectedUsers.remove(msg.newUsername);
-                friendList.removeIf( friend -> friend.getNickname().equals(msg.newUsername) );
-                printUsers();
-                setChanged();
-                notifyObservers(new Signal(Type.DISCONNECT, msg.newUsername));
+            else if(o.getClass() == Signal.class){
+                Signal s = (Signal) o;
+                if(s.type == Type.USERNAME_CHANGED){
+                    String ip  = this.connectedUsers.remove(s.message);
+                    this.connectedUsers.put(s.newUsername, ip);
+                    UserChatListener chatListener = getFriend(s.message);
+                    if(chatListener != null)
+                        chatListener.setNickname(s.newUsername);
+                    System.out.println("Username changed from [" + s.message + "] to [" + s.newUsername + "]");
+                    setChanged();
+                    notifyObservers(new Signal(Type.USERNAME_CHANGED, s.message, s.newUsername));
+                }
             }
         }
     }
