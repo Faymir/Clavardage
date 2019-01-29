@@ -35,12 +35,7 @@ public class ScanMessage implements Serializable {
         this.type = type;
         clients = new HashMap<>();
         newUserVersion = 0;
-        try(final DatagramSocket socket = new DatagramSocket()){
-            socket.connect(InetAddress.getByName("255.255.255.255"), 30000);
-            ip = socket.getLocalAddress().getHostAddress();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ip = getIp();
 
     }
 
@@ -59,5 +54,15 @@ public class ScanMessage implements Serializable {
         this(type);
         this.newUserVersion = newUserVersion;
         this.newUsername = newUsername;
+    }
+    
+    public static String getIp() {
+    	try(final DatagramSocket socket = new DatagramSocket()){
+            socket.connect(InetAddress.getByName("255.255.255.255"), 30000);
+            return socket.getLocalAddress().getHostAddress();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    	return "";
     }
 }

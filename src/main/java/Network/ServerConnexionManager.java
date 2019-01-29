@@ -1,5 +1,6 @@
 package Network;
 
+import Model.ScanMessage;
 import Model.ServerUser;
 import Model.Signal;
 import Model.Type;
@@ -72,7 +73,7 @@ public class ServerConnexionManager extends ConnexionManager<String> {
     @Override
     public void connect(String nickname) {
 
-        JSONObject response = getResponse("subscribe", "username", nickname);
+        JSONObject response = getResponse("subscribe", "username", nickname, "localIp", ScanMessage.getIp());
         String responseType = response.get("Type").toString();
 
         
@@ -154,10 +155,10 @@ public class ServerConnexionManager extends ConnexionManager<String> {
         }
     }
 
-    private JSONObject getResponse(String url, String param, String value){
+    private JSONObject getResponse(String url, String param1, String value1, String param2, String value2){
         JSONObject response = null;
         try {
-            response = this.get(url, new String[]{param}, new String[]{value});
+            response = this.get(url, new String[]{param1, param2}, new String[]{value1, value2});
         } catch (IOException e) {
             e.printStackTrace();
         }

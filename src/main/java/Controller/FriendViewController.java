@@ -91,7 +91,6 @@ public class FriendViewController extends Observable implements Observer {
     }
 
     public void disconnected(){
-        System.out.println(getClass().getResource("../disconnected.png").toString());
         this.friendViewStatus.setImage(new Image(getClass().getResource("../disconnected.png").toString()));
     }
 
