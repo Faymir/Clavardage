@@ -30,7 +30,7 @@ public class ServerConnexionManager extends ConnexionManager<String> {
 
     public ServerConnexionManager() {
         super(ManagerMode.SERVER);
-        serverUrl = "http://node6669-clavadage.jcloud.ik-server.com/webapi/";
+        serverUrl = SharedObjects.get().serverIp;
         server_port = 11000;
         clientName = null;
     }

@@ -4,7 +4,6 @@ import Model.Database;
 import Model.Signal;
 import Model.Type;
 import Network.*;
-import com.sun.imageio.spi.RAFImageInputStreamSpi;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,12 +11,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ConnexionController implements Observer
 {
@@ -74,22 +74,39 @@ public class ConnexionController implements Observer
 
     @FXML
     void radioToogled(ActionEvent event){
-        testRadioButton.setSelected(false);
-        broadcastRadioButton.setSelected(false);
-        serverRadioButton.setSelected(false);
+        AtomicReference<RadioButton> b = new AtomicReference<>();
         switch (((RadioButton)event.getSource()).getText()){
             case "Test":
-                testRadioButton.setSelected(true);
+                b.set(testRadioButton);
                 break;
             case "Broadcast":
-                broadcastRadioButton.setSelected(true);
+                b.set(broadcastRadioButton);
                 break;
             case "Server":
-                serverRadioButton.setSelected(true);
+                serverRadioButton.setSelected(false);
+                TextInputDialog dialog = new TextInputDialog("http://node6669-clavadage.jcloud.ik-server.com/webapi/");
+                dialog.setTitle("Server address");
+                dialog.setHeaderText("");
+                dialog.setContentText("Please enter url:");
+
+                Optional<String> result = dialog.showAndWait();
+                result.ifPresent(url -> {
+                    if (url.isEmpty())
+                        return;
+                    SharedObjects.get().serverIp = url;
+                    b.set(serverRadioButton);
+                });
                 break;
             default:
                 break;
         }
+        if(b.get() != null) {
+            testRadioButton.setSelected(false);
+            broadcastRadioButton.setSelected(false);
+            serverRadioButton.setSelected(false);
+            b.get().setSelected(true);
+        }
+
         //System.out.println("event = [" + ((RadioButton)event.getSource()).getText() + "]");
     }
 
@@ -99,8 +116,14 @@ public class ConnexionController implements Observer
             SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(LocalConnexionManager.class);
         else if (broadcastRadioButton.isSelected())
             SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(BroadcastConnexionManager.class);
-        else if(serverRadioButton.isSelected())
+        else if(serverRadioButton.isSelected()) {
+            if(SharedObjects.get().serverIp == null || SharedObjects.get().serverIp.isEmpty()){
+                Alert alert = new Alert(Alert.AlertType.ERROR, "You must provide a valid Server ip address", ButtonType.YES);
+                alert.showAndWait();
+                return;
+            }
             SharedObjects.get().connManager = ConnManagerFactory.getConnectionManager(ServerConnexionManager.class);
+        }
 
         String username = usernameTextEdit.getText();
 
