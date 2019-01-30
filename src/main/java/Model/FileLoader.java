@@ -18,9 +18,10 @@ public class FileLoader {
 
     private FileLoader() {
         if(!current.contains("target")){
-            current += sp + "target";
+            current += sp + "src" + sp + "main" + sp + "resources" + sp;
         }
-        current += sp + "classes" + sp;
+        else
+            current += sp + "classes" + sp;
     }
 
     public URL get(String name) throws MalformedURLException {

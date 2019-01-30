@@ -1,7 +1,5 @@
 package Controller;
-/**
- * Sample Skeleton for 'template.fxml' Controller Class
- */
+
 
 import Model.*;
 import Network.*;
@@ -33,6 +31,8 @@ import java.util.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.codec.binary.Base64;
+
+//user2%&%disconnect
 
 public class MainController implements Observer {
 
@@ -124,7 +124,7 @@ public class MainController implements Observer {
         Message m = new Message(SharedObjects.get().connManager.getClientName(), Calendar.getInstance().getTime(), textField.getText(), actualFriendName);
         textField.clear();
         SharedObjects.get().connManager.sendMessage(m);
-        discussion.addMessage(m,true);
+        discussion.addMessage(m,true); //Cette ligne rajoute aussi l'utilisateur à la liste des discussions de l'objet user rataché
         discussionWebview.getEngine().loadContent(discussion.getHtml());
     }
 
@@ -213,11 +213,6 @@ public class MainController implements Observer {
         return fileChooser.showOpenDialog(stage);
     }
 
-//    @FXML
-//    void exitApplication(ActionEvent event){
-//        saveData();
-//        Platform.exit();
-//    }
     private void initContextMenu(){
         connectedUsersList.setCellFactory(lv -> {
 
@@ -231,7 +226,7 @@ public class MainController implements Observer {
                 ContextMenu contextMenu = new ContextMenu();
             MenuItem editItem = new MenuItem();
             editItem.textProperty().bind(Bindings.format("Démarrer une discussion"));
-//            editItem.set
+
             editItem.setOnAction(event -> {
                 System.out.println("event " + event);
                 String username = cell.getItem();
@@ -291,10 +286,10 @@ public class MainController implements Observer {
     }
 
     private void handleNewConnection(Signal s){
-        this.connectedUsersList.getItems().remove(s.message);
         Platform.runLater(
                 () -> {
                     // Update UI here.
+                    this.connectedUsersList.getItems().remove(s.message);
                     this.connectedUsersList.getItems().add(s.message);
                 }
         );
@@ -354,9 +349,6 @@ public class MainController implements Observer {
 
             FXMLLoader view = null;
             try {
-
-                System.out.println("MainController user.dir = [" + System.getProperty("user.dir") + "]");
-                System.out.println("MainController user.dir = [" + getClass().getResource("../resources/friendview.fxml") + "]");
                 view = new FXMLLoader(FileLoader.getInstance().get("friendView.fxml"));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
@@ -411,7 +403,7 @@ public class MainController implements Observer {
             //TODO: create related method when select a user from list
             
             Signal s = (Signal) o;
-            if(s.type == Type.SHOW_DISCUSSION){
+                if(s.type == Type.SHOW_DISCUSSION){
                 for (FriendViewController c: friendViews) {
                     if (!c.getNickname().equals(s.message))
                         c.unselect();
@@ -444,6 +436,9 @@ public class MainController implements Observer {
             Signal s = (Signal) o;
             if(s.type == Type.NEW_MESSAGE){
                 SoundPlayer.getInstance().play(SoundPlayer.MESSAGE_TONE);
+            }
+            if(s.type == Type.DISCONNECT){
+                handleDisconnection(s);
             }
             //TODO: afficher une icone représentant le nombre de nouveau messages
         }

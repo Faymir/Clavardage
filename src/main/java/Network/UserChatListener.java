@@ -8,8 +8,7 @@ import java.net.SocketException;
 import java.util.Calendar;
 import java.util.Observable;
 
-import Model.Message;
-import Model.User;
+import Model.*;
 
 public class UserChatListener extends Observable implements Runnable {
     protected Socket socket;
@@ -58,11 +57,12 @@ public class UserChatListener extends Observable implements Runnable {
     }
 
     private void notifyListeners(String msg){
+
         lastMessage = msg;
         asNewMessage = true;
         //Cryptography cryp = new Cryptography("44449 47561", "24205 47561");
-        System.out.println("Received [" + lastMessage + "] from ip : [" + socket.getInetAddress().getHostAddress() + "] from [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort()  + "]");
-        Message m = new Message(nickname, Calendar.getInstance().getTime(),msg,null);
+        System.out.println("Received [" + lastMessage + "] from ip : [" + socket.getInetAddress().getHostAddress() + "] from [" + this.nickname + "] on port: [" + socket.getLocalPort() + "] from port: [" + socket.getPort() + "]");
+        Message m = new Message(nickname, Calendar.getInstance().getTime(), msg, null);
         setChanged();
         notifyObservers(m);
     }

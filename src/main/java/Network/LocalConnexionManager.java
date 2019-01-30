@@ -1,5 +1,6 @@
 package Network;
 
+import Model.ScanMessage;
 import Model.Signal;
 import Model.Type;
 
@@ -12,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Map;
+import java.util.Observable;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -33,7 +35,7 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
                 randomNum = ThreadLocalRandom.current().nextInt(portStart, portEnd);
                 serverSocket = new ServerSocket(randomNum);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
         server_port = randomNum;
@@ -104,14 +106,12 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
                 e.printStackTrace();
             }
             this.friendList.remove(u);
-            u = null;
         }
         System.out.println("User [" + uname + "] disconnected!!");
     }
 
     @Override
     protected void scanUsers() {
-        long a = System.currentTimeMillis();
         for (int i = portStart; i < portEnd; i++) {
             if (i != server_port && !connectedUsers.containsValue(i)) {
                 try {
@@ -122,8 +122,6 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
                     sortieVersClient.println(" " + "%&%" + "scan");
                     sortieVersClient.flush();
                     String username = entreeDepuisClient.readLine();
-                    System.out.println("new user: " + username);
-                    //User u = new User(username, socket);
 
                     this.connectedUsers.put(username, i);
                     entreeDepuisClient.close();
@@ -132,15 +130,13 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
                 } catch (SocketTimeoutException e) {
                     System.out.println("timeout");
                 } catch (ConnectException e) {
-                    System.out.println("not opened");//e.printStackTrace();
+                    //e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        System.out.println("time = " + (System.currentTimeMillis() - a));
         printUsers();
-        System.out.println("\t\tEnd Scan");
     }
 
     @Override
@@ -168,4 +164,5 @@ public class LocalConnexionManager extends ConnexionManager<Integer> {
     public void disconnect() {
         sendUpdateInformation(clientName+"%&%"+"disconnect");
     }
+
 }

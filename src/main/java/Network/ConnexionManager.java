@@ -25,7 +25,7 @@ import java.util.*;
  *      => traitment du message recu (à voir plus tard ***********************)
  *
  *
- * Ok Reste a corriger le bug de contact par l'autre (différence de port en recption et en emission) => mettre a jour connectedUsers avec la nouvelle valeure du port
+ *
  *
  */
 
@@ -84,7 +84,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
                 Socket socket = serverSocket.accept();
                 BufferedReader entreeDepuisClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String msg = entreeDepuisClient.readLine();
-                System.out.println("Message: {" + msg + "}");
                 this.handleMessage(msg, socket);
 
             }
@@ -132,7 +131,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
 
     protected void handleMessage(String msg, Socket socket){
 
-        System.out.println("\t\t************* DEB handleMessage");
         if(msg == null || msg.isEmpty()){
             System.out.println("Nothing handled");
         }
@@ -179,7 +177,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
                     break;
             }
         }
-        System.out.println("\t\t************* END handle Message");
     }
 
     protected abstract void handleConnected(String uname, Socket socket);
@@ -219,7 +216,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
                 sortieVersClient = new PrintWriter(socket.getOutputStream());
                 sortieVersClient.println(msg);
                 sortieVersClient.flush();
-                System.out.println("Sended (socket)!!!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -242,7 +238,6 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
 //                System.out.println("encrypted msg = [" + crypt.encryptToString(m.getMessage()) + "]");
                 sortieVersClient.println(m.getMessage());
                 sortieVersClient.flush();
-                System.out.println("Sended!!!");
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -266,6 +261,7 @@ public abstract class ConnexionManager<T> extends Observable implements Runnable
                 sendMessage(s,clientName + "%&%" + "initConnection");
                 (new Thread(u)).start();
                 this.friendList.add(u);
+                u.addObserver(this);
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();

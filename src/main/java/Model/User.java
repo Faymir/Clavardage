@@ -37,9 +37,16 @@ public class User extends Observable implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         if (observable.getClass() == UserChatListener.class) {
-            this.discussion.add((Message) o);
-            setChanged();
-            notifyObservers(new Signal(Type.NEW_MESSAGE, getNewMessageNumber()));
+            Message s = (Message) o;
+            if(s.getMessage().contains("%&%disconnect")){
+                setChanged();
+                notifyObservers(new Signal(Type.DISCONNECT, s.getMessage().split("%&%")[0]));
+            }
+            else{
+                this.discussion.add(s);
+                setChanged();
+                notifyObservers(new Signal(Type.NEW_MESSAGE, getNewMessageNumber()));
+            }
         }
     }
 

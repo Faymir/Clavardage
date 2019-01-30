@@ -48,8 +48,6 @@ public class ConnexionController implements Observer
 
     @FXML
     public void initialize(){
-
-        System.out.println("Initialize connexion window");
         testRadioButton.setSelected(false);
         broadcastRadioButton.setSelected(true);
         serverRadioButton.setSelected(false);

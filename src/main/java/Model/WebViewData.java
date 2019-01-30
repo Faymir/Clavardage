@@ -39,23 +39,9 @@ public class WebViewData {
     }
 
     private void init(){
-//        try {
-            /*String current = System.getProperty("user.dir") + "/View/";
-
-            System.out.println("\n\nRessources = "+ getClass().getResource("../head.html").getPath() + "\n\n");*/
-
-            System.out.println("WebViewData user.dir = [" + System.getProperty("user.dir") + "]");
-            System.out.println("WebViewData ../resources/head.html = [" + getClass().getResource("../resources/head.html") + "]");
-            System.out.println("WebViewData resources/head.html = [" + getClass().getResource("resources/head.html") + "]");
-            System.out.println("WebViewData head.html= [" + getClass().getResource("head.html") + "]");
-            System.out.println("WebViewData ../../resources/head.html = [" + getClass().getResource("../../resources/head.html") + "]");
             vanillaHead = FileLoader.getInstance().getHeadhtml();
             head = vanillaHead + "<div class=\"card-body msg_card_body\">";
             tail = FileLoader.getInstance().getTailhtml();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            System.out.println("Fichier head.html ou tail non trouvé");
-//        }
     }
     public void loadDiscussion(){
         this.addMessage(null, false);

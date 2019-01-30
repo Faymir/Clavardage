@@ -111,10 +111,9 @@ public class FriendViewController extends Observable implements Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        //TODO afficher le nombre de nouveaux messages
         Signal s = (Signal) o;
 
-        if(this.selected){
+        if(this.selected && s.type == Type.NEW_MESSAGE){
             setChanged();
             notifyObservers(new Signal(Type.SHOW_DISCUSSION,nickname));
         }
