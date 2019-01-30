@@ -1,13 +1,35 @@
 # Clavardage
 
 A distributed Chatting app based on sockets. It is made with Java and using JavaFX UI as GUI.
+ 
+![alt text](./Clavardage.png "ScreenShot")
 
-## Requirements
-Java 8 is recommended. It should works on higher versions but not tested.
-Please report any issue.
 
 ## Have tree modes:
 
-+ Broadcast mode for local network
-+ A Test mode just to test on one machine
-+ A centralized mode with a Server (not yet implemented
++ A Test mode:  To open multiple clients on same machine, for testing purpose
++ Broadcast mode for local networks
++ A centralized mode with a Server on ip address http://node6669-clavadage.jcloud.ik-server.com/webapi/
+
+## Requirements
++ Java Runtime Environment 8 is recommended. It should works on higher versions but not tested.
+Please report any issue.
+
+
+##Usage
+
++ Execute chat.jar 
++ or from console run `java -jar chat.jar`
+
+NB: The Jar file must be in the root directory of the project because it use resources located in 
+
++-- src
+|   +-- main
+|       ..
+|       +-- **resources**
++-- **chat.jar**
+
+## Development Requirements
+
++ JDK >= 1.8
++ Maven
