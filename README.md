@@ -5,6 +5,11 @@ A distributed Chatting app based on sockets. It is made with Java and using Java
 ![alt text](./Clavardage.png "ScreenShot")
 
 
+Login page
+
+![alt text](./Clavardage_login.png "ScreenShot")
+
+
 ## Have tree modes:
 
 + A Test mode:  To open multiple clients on same machine, for testing purpose
