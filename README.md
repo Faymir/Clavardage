@@ -1,6 +1,4 @@
 # Clavardage
-
-A distributed Chatting app based on sockets. It is made with Java and using JavaFX UI as GUI.
  
 ![alt text](./Clavardage.png "ScreenShot")
 
