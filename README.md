@@ -1,6 +1,4 @@
 # Clavardage
-
-A distributed Chatting app based on sockets. It is made with Java and using JavaFX UI as GUI.
  
 ![alt text](./Clavardage.png "ScreenShot")
 
@@ -27,13 +25,16 @@ Please report any issue.
 + or from console run `java -jar chat.jar`
 
 NB: The Jar file must be in the root directory of the project because it use resources located in 
-
+```
+.
++-- diagrams
++-- libs
 +-- src
 |   +-- main
 |       ..
-|       +-- **resources**
-+-- **chat.jar**
-
+|       +-- resources
++-- chat.jar
+``` 
 ## Development Requirements
 
 + JDK >= 1.8
