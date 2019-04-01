@@ -17,9 +17,10 @@ Login page
 ## Requirements
 + Java Runtime Environment 8 is recommended. It should works on higher versions but not tested.
 Please report any issue.
++ JavaFx Runtime
 
 
-##Usage
+## Usage
 
 + Execute chat.jar 
 + or from console run `java -jar chat.jar`
